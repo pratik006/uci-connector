@@ -1,0 +1,1 @@
+java -jar uci-connector-jar-with-dependencies.jar -clientui
