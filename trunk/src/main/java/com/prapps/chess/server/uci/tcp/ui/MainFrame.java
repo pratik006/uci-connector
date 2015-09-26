@@ -34,8 +34,8 @@ public class MainFrame extends javax.swing.JFrame {
 			System.out.println(System.getProperty("java.home"));
 			
 			DefaultTableModel tableModel =  (DefaultTableModel) tblServers.getModel();
-			for(Server adminServer : adminServer.getServerConfig().getServers()) {
-				tableModel.addRow(new String[]{adminServer.getName(),adminServer.getPort()+""});
+			for(Server server : adminServer.getServerConfig().getServers()) {
+				tableModel.addRow(new String[]{server.getName(),server.getPort()+""});
 			}
 			LOG.info("Admin Server : Log initialized");
 		} catch (Exception e) {
