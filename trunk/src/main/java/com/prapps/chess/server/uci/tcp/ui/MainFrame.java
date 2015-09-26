@@ -21,7 +21,7 @@ import com.prapps.chess.server.uci.tcp.Server;
 public class MainFrame extends javax.swing.JFrame {
 
 	private static Logger LOG = Logger.getLogger("uci-server");
-	private AdminServer server;	
+	private AdminServer adminServer;	
 	
     /**
      * Creates new form MainFrame
@@ -29,13 +29,13 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         try {
-			server = new AdminServer("serverConfig.xml");
+			adminServer = new AdminServer("serverConfig.xml");
 			System.getProperties().put("-Djava.util.logging.config.file", "h:/logging.properties");
 			System.out.println(System.getProperty("java.home"));
 			
 			DefaultTableModel tableModel =  (DefaultTableModel) tblServers.getModel();
-			for(Server server : server.getServerConfig().getServers()) {
-				tableModel.addRow(new String[]{server.getName(),server.getPort()+""});
+			for(Server adminServer : adminServer.getServerConfig().getServers()) {
+				tableModel.addRow(new String[]{adminServer.getName(),adminServer.getPort()+""});
 			}
 			LOG.info("Admin Server : Log initialized");
 		} catch (Exception e) {
@@ -140,21 +140,19 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>                        
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {                                  
-    	server.close();   
+    	adminServer.close();   
     }                                 
 
     private void cmdStartServerActionPerformed(java.awt.event.ActionEvent evt) {                                               
-        // TODO add your handling code here:
         try {
-            server.start();
+        	adminServer.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }                                              
 
     private void cmdQuitActionPerformed(java.awt.event.ActionEvent evt) {                                        
-        // TODO add your handling code here:
-        server.close();
+    	adminServer.close();
     }                                       
 
     /**
