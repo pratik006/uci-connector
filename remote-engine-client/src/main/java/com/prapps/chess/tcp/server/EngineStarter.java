@@ -18,12 +18,14 @@ public class EngineStarter {
 		while (true) {
 			int targetPort = engineStartPort + 1;
 			System.out.println("Connecting..."+ip+"\tport: "+targetPort);
-			Socket socket = new Socket(ip, targetPort);
-			System.out.println(socket);
-			cb.connect(socket);
-			System.out.println("connection closed.... starting new");
+			try {
+				Socket socket = new Socket(ip, targetPort);
+				System.out.println(socket);
+				cb.connect(socket);
+				System.out.println("connection closed.... starting new");
+				cb.start();
+			}catch(Exception ex) {}
 			Thread.sleep(1000);
-			cb.start();
 		}		
 	}
 

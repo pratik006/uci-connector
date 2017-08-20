@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 public class ChessEngine {
-	private static Logger LOG = Logger.getLogger(ChessEngine.class.getName());
+	private static Logger LOG = Logger.getLogger(ChessEngine.class);
 	
 	private static final int BUF_SIZE = 1024*10;
 	public static String QUIT_CMD = "quit\r\n";
@@ -22,6 +23,14 @@ public class ChessEngine {
 	public ChessEngine(String enginePath, String command) throws IOException {
 		this.path = enginePath;
 		this.command = command;
+	}
+	
+	public ChessEngine getMe() {
+		return this;
+	}
+	
+	public void close() {
+		process.destroy();
 	}
 	
 	public boolean isReady() throws Exception {
@@ -47,7 +56,7 @@ public class ChessEngine {
 
 	public void start() throws IOException {
 		Process p = null;
-		LOG.fine("\n--------------------------------------Start Engine ----------------------------------\n");
+		LOG.trace("\n--------------------------------------Start Engine ----------------------------------\n");
 		if (null == command || "".equals(command)) {
 			p = Runtime.getRuntime().exec(path);
 		} else {
@@ -86,6 +95,8 @@ public class ChessEngine {
 					pipe(socket.getInputStream(), pos);
 				} catch (IOException e) {
 					e.printStackTrace();
+					LOG.error(e.getMessage());
+					getMe().close();
 				}
 			}
 		});
@@ -96,6 +107,7 @@ public class ChessEngine {
 					pipe(pis, socket.getOutputStream());
 				} catch (IOException e) {
 					e.printStackTrace();
+					LOG.error(e.getMessage());
 				}
 			}
 		});
@@ -108,7 +120,7 @@ public class ChessEngine {
 		byte[] buf = new byte[BUF_SIZE];
 		int read = -1;
 		while ((read = is.read(buf)) != -1) {
-			System.out.println("cmd: "+new String(buf, 0, read));
+			LOG.trace(new String(buf, 0, read));
 			os.write(buf, 0, read);
 			os.flush();
 			if (new String(buf).contains("quit")) {
