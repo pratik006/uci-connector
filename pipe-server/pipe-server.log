@@ -1,0 +1,73 @@
+2017-08-20 23:44:15 INFO  PipeServer:51 - starting at port:11121
+2017-08-20 23:44:15 INFO  PipeServer:51 - starting at port:11125
+2017-08-20 23:44:15 INFO  PipeServer:51 - starting at port:11123
+2017-08-20 23:44:15 INFO  PipeServer:51 - starting at port:11122
+2017-08-20 23:44:15 INFO  PipeServer:51 - starting at port:11124
+2017-08-20 23:45:47 INFO  PipeServer:51 - starting at port:11122
+2017-08-20 23:45:47 INFO  PipeServer:51 - starting at port:11125
+2017-08-20 23:45:47 INFO  PipeServer:51 - starting at port:11121
+2017-08-20 23:45:47 INFO  PipeServer:51 - starting at port:11124
+2017-08-20 23:45:47 INFO  PipeServer:51 - starting at port:11123
+2017-08-20 23:46:32 INFO  PipeServer:99 - Socket Closed
+2017-08-20 23:46:32 INFO  PipeServer:51 - starting at port:11121
+2017-08-20 23:47:37 INFO  PipeServer:51 - starting at port:11121
+2017-08-20 23:47:37 INFO  PipeServer:51 - starting at port:11124
+2017-08-20 23:47:37 INFO  PipeServer:51 - starting at port:11123
+2017-08-20 23:47:37 INFO  PipeServer:51 - starting at port:11125
+2017-08-20 23:47:37 INFO  PipeServer:51 - starting at port:11122
+2017-08-20 23:47:46 INFO  PipeServer:99 - Socket Closed
+2017-08-20 23:47:46 INFO  PipeServer:51 - starting at port:11121
+2017-08-20 23:48:05 INFO  PipeServer:51 - starting at port:11121
+2017-08-20 23:48:05 INFO  PipeServer:51 - starting at port:11125
+2017-08-20 23:48:05 INFO  PipeServer:51 - starting at port:11123
+2017-08-20 23:48:05 INFO  PipeServer:51 - starting at port:11122
+2017-08-20 23:48:05 INFO  PipeServer:51 - starting at port:11124
+2017-08-20 23:48:08 TRACE PipeServer:55 - Port: 1 is ready
+2017-08-20 23:48:11 TRACE PipeServer:66 - connection accepted: 1
+2017-08-20 23:48:11 TRACE PipeServer:127 - Stockfish DD 64 by Tord Romstad, Marco Costalba and Joona Kiiski
+
+2017-08-20 23:48:12 TRACE PipeServer:127 - uci
+
+2017-08-20 23:48:12 TRACE PipeServer:127 - id name Stockfish DD 64
+id author Tord Romstad, Marco Costalba and Joona Kiiski
+
+option name Write Debug Log type check default false
+option name Write Search Log type check default false
+option name Search Log Filename type string default SearchLog.txt
+option name Book File type string default book.bin
+option name Best Book Move type check default false
+option name Contempt Factor type spin default 0 min -50 max 50
+option name Mobility (Midgame) type spin default 100 min 0 max 200
+option name Mobility (Endgame) type spin default 100 min 0 max 200
+option name Pawn Structure (Midgame) type spin default 100 min 0 max 200
+option name Pawn Structure (Endgame) type spin default 100 min 0 max 200
+option name Passed Pawns (Midgame) type spin default 100 min 0 max 200
+option name Passed Pawns (Endgame) type spin default 100 min 0 max 200
+option name Space type spin default 100 min 0 max 200
+option name Aggressiveness type spin default 100 min 0 max 200
+option name Cowardice type spin default 100 min 0 max 200
+option name Min Split Depth type spin default 0 min 0 max 12
+option name Max Threads per Split Point type spin default 5 min 4 max 8
+option name Threads type spin default 1 min 1 max 64
+option name Idle Threads Sleep type check default false
+option name Hash type spin default 32 min 1 max 8192
+option name Clear Hash type button
+option name Ponder type check default true
+option name OwnBook type check default false
+option name MultiPV type spin default 1 min 1 max 500
+option name Skill Level type spin default 20 min 0 max 20
+option name Emergency Move Horizon type spin default 40 min 0 max 50
+option name Emergency Base Time type spin default 60 min 0 max 30000
+option name Emergency Move Time type spin default 30 min 0 max 5000
+option name Minimum Thinking Time type spin default 20 min 0 max 5000
+option name Slow Mover type spin default 70 min 10 max 1000
+option name UCI_Chess960 type check default false
+option name UCI_AnalyseMode type check default false
+uciok
+
+2017-08-20 23:48:13 TRACE PipeServer:127 - quit
+
+2017-08-20 23:48:13 INFO  PipeServer:99 - Socket Closed
+2017-08-20 23:48:13 TRACE PipeServer:68 - Socket[addr=/127.0.0.1,port=56054,localport=11111]
+2017-08-20 23:48:13 INFO  PipeServer:51 - starting at port:11121
+2017-08-20 23:48:14 TRACE PipeServer:55 - Port: 1 is ready

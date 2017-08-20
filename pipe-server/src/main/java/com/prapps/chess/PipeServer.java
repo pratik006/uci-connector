@@ -6,11 +6,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 public class PipeServer {
+	private static Logger LOG = Logger.getLogger(PipeServer.class);
+	
 	private static final int BUF_SIZE = 1024*10;
 	private Socket engineSocket;
 	private ServerSocket serverSocket;
@@ -40,19 +42,17 @@ public class PipeServer {
 	public static void startServer(Properties prop) throws Exception {
 		final int chessbaseStartPort = Integer.parseInt(prop.getProperty("chessbase-start-port"));
 		final int engineStartPort = Integer.parseInt(prop.getProperty("engine-start-port"));
-		final Map<Integer, PipeServer> servers = new HashMap<Integer, PipeServer>();
 		
 		for (int i=1; i<=5; i++) {
 			final Integer port = i;
 			new Thread(new Runnable() {
 				public void run() {
 					while(true) {
-						System.out.println("starting at port:"+(engineStartPort+port));
+						LOG.info("starting at port:"+(engineStartPort+port));
 						try {
 							final PipeServer pipeServer = new PipeServer(engineStartPort + port);
 							pipeServer.start();
-							servers.put(port, pipeServer);
-							System.out.println("Port: "+port+" is ready");
+							LOG.trace("Port: "+port+" is ready");
 							
 							
 							Thread cbt = new Thread(new Runnable() {
@@ -63,10 +63,9 @@ public class PipeServer {
 											int targetPort = chessbaseStartPort + port;
 											serverSocket = new ServerSocket(targetPort);
 											Socket socket = serverSocket.accept();
-											System.out.println("connection accepted: " + port);
-											System.out.println(servers);
+											LOG.trace("connection accepted: " + port);
 											pipeServer.connect(socket);
-											System.out.println(socket);
+											LOG.trace(socket);
 										} catch (Exception e) {
 											e.printStackTrace();
 										} finally {
@@ -97,7 +96,7 @@ public class PipeServer {
 				try {
 					pipe(engineSocket.getInputStream(), chessbaseSocket.getOutputStream());
 				} catch (IOException e) {
-					System.out.println("Socket Closed");
+					LOG.info("Socket Closed");
 				} 
 			}
 		});
@@ -108,14 +107,14 @@ public class PipeServer {
 				try {
 					pipe(chessbaseSocket.getInputStream(), engineSocket.getOutputStream());
 				} catch (IOException e) {
-					e.printStackTrace();
+					LOG.info("Socket Closed");
 				}
 			}
 		});
 		t2.start();
 		t1.join();
 		t2.join();
-		System.out.println("conn closed");
+		System.out.println("connection closed");
 	}
 	
 	public void pipe(InputStream is, OutputStream os) throws IOException {
@@ -125,6 +124,7 @@ public class PipeServer {
 			os.write(buf, 0, read);
 			os.flush();
 			String data = new String(buf, 0, read);
+			LOG.trace(data);
 			if (data.contains("quit")) {
 				close();
 				break;

@@ -2,9 +2,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.prapps.chess</groupId>
-	<artifactId>uci-client</artifactId>
+	<artifactId>remote-engine-client</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>uci-client</name>
+	<name>remote-engine-client</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+
+	</dependencies>
 
 	<profiles>
 		<profile>
@@ -13,7 +22,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<build>
-				<finalName>uci-client</finalName>
+				<finalName>remote-engine-client</finalName>
 				<defaultGoal>clean compile assembly:single</defaultGoal>
 				<plugins>
 					<plugin>
@@ -29,7 +38,7 @@
 						<configuration>
 							<archive>
 								<manifest>
-									<mainClass>com.prapps.chess.client.tcp.ChessbaseClientAdapter</mainClass>
+									<mainClass>com.prapps.chess.tcp.server.EngineStarter</mainClass>
 								</manifest>
 							</archive>
 							<descriptorRefs>
