@@ -49,7 +49,7 @@
 						<configuration>
 							<archive>
 								<manifest>
-									<mainClass>com.prapps.chess.client.http.HttpChessClient</mainClass>
+									<mainClass>com.prapps.chess.client.tcp.ChessbaseClientAdapter</mainClass>
 								</manifest>
 							</archive>
 							<descriptorRefs>
