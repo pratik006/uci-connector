@@ -27,6 +27,7 @@ public class PipeServer {
 			}catch(Exception ex) { }
 		}
 		serverSocket = new ServerSocket(port);
+		System.out.println("Listening on : "+port);
 		engineSocket = serverSocket.accept();
 	}
 	
@@ -77,7 +78,8 @@ public class PipeServer {
 					ServerSocket serverSocket = null;
 					while (!stopFlag) {
 						try {
-							serverSocket = new ServerSocket(chessbaseStartPort + port);
+							int targetPort = chessbaseStartPort + port;
+							serverSocket = new ServerSocket(targetPort);
 							while (!stopFlag) {
 								Socket socket = serverSocket.accept();
 								System.out.println("connection accepted: " + port);
