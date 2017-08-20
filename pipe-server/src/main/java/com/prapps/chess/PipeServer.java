@@ -46,61 +46,48 @@ public class PipeServer {
 			final Integer port = i;
 			new Thread(new Runnable() {
 				public void run() {
-					try {
-						PipeServer server = servers.get(port);
-						if (null != server) {
-							try {
-							server.close();
-							}catch(Exception ex) { }
-							servers.remove(port);
-						}
-						
-						PipeServer pipeServer = new PipeServer(engineStartPort + port);
-						System.out.println("starting at port:"+port);
-						pipeServer.start();
-						
-						
-						servers.put(port, pipeServer);
-						System.out.println("Port: "+port+" is ready");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					
-				}
-			}).start();
-		}
-		
-		final boolean stopFlag = false;
-		for (int i=1; i<=5; i++) {
-			final Integer port = i;
-			new Thread(new Runnable() {
-				public void run() {
-					ServerSocket serverSocket = null;
-					while (!stopFlag) {
+					while(true) {
+						System.out.println("starting at port:"+(engineStartPort+port));
 						try {
-							int targetPort = chessbaseStartPort + port;
-							serverSocket = new ServerSocket(targetPort);
-							while (!stopFlag) {
-								Socket socket = serverSocket.accept();
-								System.out.println("connection accepted: " + port);
-								PipeServer server = servers.get(port);
-								server.connect(socket);
-								System.out.println(socket);
-							}
+							final PipeServer pipeServer = new PipeServer(engineStartPort + port);
+							pipeServer.start();
+							servers.put(port, pipeServer);
+							System.out.println("Port: "+port+" is ready");
+							
+							
+							Thread cbt = new Thread(new Runnable() {
+								public void run() {
+									ServerSocket serverSocket = null;
+									//while (true) {
+										try {
+											int targetPort = chessbaseStartPort + port;
+											serverSocket = new ServerSocket(targetPort);
+											Socket socket = serverSocket.accept();
+											System.out.println("connection accepted: " + port);
+											System.out.println(servers);
+											pipeServer.connect(socket);
+											System.out.println(socket);
+										} catch (Exception e) {
+											e.printStackTrace();
+										} finally {
+											try {
+												serverSocket.close();
+											} catch (IOException e) {
+												e.printStackTrace();
+											}
+										}
+									//}
+								}
+							});
+							cbt.start();
+							cbt.join();
 						} catch (Exception e) {
 							e.printStackTrace();
-						} finally {
-							try {
-								serverSocket.close();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
 						}
 					}
 				}
 			}).start();
 		}
-		
 	}
 	
 	public void connect(final Socket chessbaseSocket) throws Exception {
@@ -110,8 +97,8 @@ public class PipeServer {
 				try {
 					pipe(engineSocket.getInputStream(), chessbaseSocket.getOutputStream());
 				} catch (IOException e) {
-					e.printStackTrace();
-				}
+					System.out.println("Socket Closed");
+				} 
 			}
 		});
 		t1.start();
@@ -128,6 +115,7 @@ public class PipeServer {
 		t2.start();
 		t1.join();
 		t2.join();
+		System.out.println("conn closed");
 	}
 	
 	public void pipe(InputStream is, OutputStream os) throws IOException {

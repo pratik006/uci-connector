@@ -15,10 +15,14 @@ public class EngineStarter {
 		
 		ChessEngine cb = new ChessEngine(config.getProperty("1"), null);
 		cb.start();
-		while (cb.isReady()) {
-			Socket socket = new Socket(ip, engineStartPort + 1);
+		while (true) {
+			int targetPort = engineStartPort + 1;
+			System.out.println("Connecting..."+ip+"\tport: "+targetPort);
+			Socket socket = new Socket(ip, targetPort);
 			System.out.println(socket);
 			cb.connect(socket);
+			System.out.println("connection closed.... starting new");
+			Thread.sleep(1000);
 			cb.start();
 		}		
 	}

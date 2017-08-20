@@ -79,7 +79,7 @@ public class ChessEngine {
 		if (null == pipeServerSocket) {
 			pipeServerSocket = socket;
 		}
-		
+		start();
 		Thread t1 = new Thread(new Runnable() {
 			public void run() {
 				try {
