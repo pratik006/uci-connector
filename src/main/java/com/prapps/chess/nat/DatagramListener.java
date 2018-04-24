@@ -127,12 +127,13 @@ public class DatagramListener {
 			}
 		}).start();
 		
-		new Thread(new Runnable() {
+		Thread peerReadThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				while (true) {
 					DatagramPacket receive = new DatagramPacket(new byte[2000], 2000);
 					try {
+						System.out.println("waiting for peer msg on "+peerSocket.getPort());
 						peerSocket.receive(receive);
 						System.out.println("recvd from peer");
 						peerPacketListeners.forEach((listener) -> {
@@ -181,12 +182,13 @@ public class DatagramListener {
 				try {
 					InetAddress targetAddress = InetAddress.getByName(nat.getHost());
 					peerSocket = new DatagramSocket(new InetSocketAddress(srcAddress, srcPort+1));
-					peerSocket.connect(targetAddress, nat.getPort());
+					peerSocket.connect(targetAddress, nat.getPort()+1);
+					peerReadThread.start();
 					while (ackCount < 100 && !restart) {
 						suspendStun = true;
 						DatagramPacket send = new DatagramPacket(msg.getBytes(), msg.getBytes().length);
 						peerSocket.send(send);
-						//System.out.println(id+" sent ack"+send.getAddress().getHostName()+":"+send.getPort());
+						System.out.println(id+" sent ack"+send.getAddress().getHostName()+":"+send.getPort());
 						Thread.sleep(1000);
 					}
 				} catch (IOException | InterruptedException e) {
@@ -194,6 +196,8 @@ public class DatagramListener {
 				}
 			}
 		}).start();
+		
+		
 	}
 	
 	public void registerListener(PacketListener listener) {

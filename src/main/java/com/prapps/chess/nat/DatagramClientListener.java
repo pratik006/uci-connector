@@ -127,7 +127,7 @@ public class DatagramClientListener {
 			}
 		}).start();
 		
-		new Thread(new Runnable() {
+		Thread peerReadThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				while (true) {
@@ -182,6 +182,7 @@ public class DatagramClientListener {
 					InetAddress targetAddress = InetAddress.getByName(nat.getHost());
 					peerSocket = new DatagramSocket(new InetSocketAddress(srcAddress, srcPort+1));
 					peerSocket.connect(targetAddress, nat.getPort());
+					peerReadThread.start();
 					while (ackCount < 100 && !restart) {
 						suspendStun = true;
 						DatagramPacket send = new DatagramPacket(msg.getBytes(), msg.getBytes().length);
