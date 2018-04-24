@@ -180,7 +180,7 @@ public class DatagramClientListener {
 				String msg = "ack";
 				try {
 					InetAddress targetAddress = InetAddress.getByName(nat.getHost());
-					peerSocket = new DatagramSocket(srcPort+1);
+					peerSocket = new DatagramSocket(new InetSocketAddress(srcAddress, srcPort+1));
 					peerSocket.connect(targetAddress, nat.getPort());
 					while (ackCount < 100 && !restart) {
 						suspendStun = true;

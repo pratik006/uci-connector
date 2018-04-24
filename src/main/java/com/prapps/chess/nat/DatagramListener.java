@@ -40,6 +40,8 @@ public class DatagramListener {
 	private boolean suspendStun = false;
 	private Integer ackCount;
 	private static boolean restart = true;
+	private static InetAddress srcAddress;
+	private static int srcPort = 12000;
 	
 	private LinkedList<DatagramPacket> packets = new LinkedList<DatagramPacket>();
 	private LinkedList<DatagramPacket> peerPackets = new LinkedList<DatagramPacket>();
@@ -61,8 +63,8 @@ public class DatagramListener {
 	}
 
 	public static void main(String[] args) throws Exception {
-		InetAddress iaddress = getLocalAddress();
-		DatagramSocket dgSocket = new DatagramSocket(new InetSocketAddress(iaddress, 14000));
+		srcAddress = getLocalAddress();
+		DatagramSocket dgSocket = new DatagramSocket(new InetSocketAddress(srcAddress, srcPort));
 		dgSocket.setSoTimeout(100000);
 		dgSocket.setReuseAddress(true);
 		InetAddress stunServer = InetAddress.getByName(STUN_SERVERS[STUN_SERVER_INDEX][0]);
@@ -178,7 +180,7 @@ public class DatagramListener {
 				String msg = "ack";
 				try {
 					InetAddress targetAddress = InetAddress.getByName(nat.getHost());
-					peerSocket = new DatagramSocket(12001);
+					peerSocket = new DatagramSocket(new InetSocketAddress(srcAddress, srcPort+1));
 					peerSocket.connect(targetAddress, nat.getPort());
 					while (ackCount < 100 && !restart) {
 						suspendStun = true;
