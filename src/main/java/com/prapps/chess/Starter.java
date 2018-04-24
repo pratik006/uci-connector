@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
 
-import com.prapps.chess.client.tcp.cb.ChessbaseClientAdapter;
+import com.prapps.chess.client.tcp.cb.EngineClientAdapter;
 import com.prapps.chess.client.tcp.ui.TCPClientUtil;
 import com.prapps.chess.server.uci.tcp.AdminServer;
 import com.prapps.chess.server.uci.tcp.ui.MainFrame;
@@ -23,7 +23,7 @@ public class Starter {
 		}
 		else if("client".equals(args[0])) {
 			try {
-				ChessbaseClientAdapter.main(args);
+				EngineClientAdapter.main(args);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

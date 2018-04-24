@@ -68,10 +68,9 @@ public class AdminServer {
 		LOG.info("protocol type: "+serverConfig.getProtocol());
 		LOG.info("admin port: "+adminPort);
 		//adminServerSocket = new ServerSocket(adminPort);
-		Thread mailer = new Thread(new MailerThread(serverConfig));mailer.start();
+		//Thread mailer = new Thread(new MailerThread(serverConfig));mailer.start();
 		
 		new Thread(new Runnable() {
-
 			public void run() {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 				String line = null;

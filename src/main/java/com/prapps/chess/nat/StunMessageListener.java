@@ -43,7 +43,7 @@ public class StunMessageListener implements PacketListener {
 			if ((ma == null) || (ca == null)) {
 				System.out.println("Response does not contain a Mapped Address or Changed Address message attribute.");
 			} else {
-				System.out.println(ma.getAddress().getInetAddress().getHostName()+" : "+ma.getPort());
+				System.out.println("Mapped address "+ma.getAddress().getInetAddress().getHostName()+" : "+ma.getPort());
 				RestUtil.updateNatDetails(id, ma.getAddress().getInetAddress().getHostName(), ma.getPort());
 				/*if ((ma.getPort() == dgSocket.getLocalPort()) && (ma.getAddress().getInetAddress().equals(dgSocket.getLocalAddress()))) {
 					System.out.println("Node is not natted.");
@@ -51,8 +51,10 @@ public class StunMessageListener implements PacketListener {
 					System.out.println("Node is natted.");
 				}*/
 			}
-		} catch(IOException | MessageHeaderParsingException | UtilityException | MessageAttributeParsingException ex) {
+		} catch(IOException | UtilityException | MessageAttributeParsingException ex) {
 			ex.printStackTrace();
+		} catch (MessageHeaderParsingException e) {
+			//
 		}
 		
 	}

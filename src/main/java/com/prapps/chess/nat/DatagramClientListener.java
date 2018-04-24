@@ -22,7 +22,7 @@ import de.javawi.jstun.header.MessageHeader;
 import de.javawi.jstun.header.MessageHeaderParsingException;
 import de.javawi.jstun.util.UtilityException;
 
-public class DatagramListener {
+public class DatagramClientListener {
 	
 	private static final String[][] STUN_SERVERS = new String[][] {
 			{"jstun.javawi.de","3478"},
@@ -39,6 +39,8 @@ public class DatagramListener {
 	private boolean suspendStun = false;
 	private Integer ackCount;
 	private static boolean restart = true;
+	private static InetAddress srcAddress;
+	private static int srcPort = 13000;
 	
 	private LinkedList<DatagramPacket> packets = new LinkedList<DatagramPacket>();
 	private LinkedList<DatagramPacket> peerPackets = new LinkedList<DatagramPacket>();
@@ -47,7 +49,7 @@ public class DatagramListener {
 	private P2PMessageListener p2pMessageListener;
 	private StunMessageListener stunMessageListener;
 	
-	public DatagramListener(String id, DatagramSocket dgSocket, InetAddress stunServer, int stunServerPort) {
+	public DatagramClientListener(String id, DatagramSocket dgSocket, InetAddress stunServer, int stunServerPort) {
 		this.id = id;
 		this.dgSocket = dgSocket;
 		this.stunServer = stunServer;
@@ -61,14 +63,14 @@ public class DatagramListener {
 
 	public static void main(String[] args) throws Exception {
 		int selectedServerIndex = 0;
-		InetAddress iaddress = getLocalAddress();
-		DatagramSocket dgSocket = new DatagramSocket(new InetSocketAddress(iaddress, 14000));
+		srcAddress = getLocalAddress();
+		DatagramSocket dgSocket = new DatagramSocket(new InetSocketAddress(srcAddress, srcPort));
 		dgSocket.setSoTimeout(100000);
 		dgSocket.setReuseAddress(true);
 		InetAddress stunServer = InetAddress.getByName(STUN_SERVERS[selectedServerIndex][0]);
 		int stunServerPort = Integer.parseInt(STUN_SERVERS[selectedServerIndex][1]);
 		dgSocket.connect(stunServer, stunServerPort);
-		DatagramListener listener = new DatagramListener("Desky", dgSocket, stunServer, stunServerPort);
+		DatagramClientListener listener = new DatagramClientListener("lappy", dgSocket, stunServer, stunServerPort);
 		//while (restart) {
 			listener.listen();
 			//if (restart) {
@@ -79,9 +81,9 @@ public class DatagramListener {
 	
 	public void listen() throws IOException, InterruptedException {
 		restart = false;
-		final DatagramListener me = this;
+		final DatagramClientListener me = this;
 		try {
-			me.getMappedAddress(dgSocket);
+			getMappedAddress(dgSocket);
 		} catch (MessageAttributeParsingException | MessageHeaderParsingException | UtilityException e1) {
 			e1.printStackTrace();
 		}
@@ -172,13 +174,13 @@ public class DatagramListener {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					nat = RestUtil.getOtherNatDetails("lappy");
+					nat = RestUtil.getOtherNatDetails("Desky");
 					System.out.println(nat);
 				}
 				String msg = "ack";
 				try {
 					InetAddress targetAddress = InetAddress.getByName(nat.getHost());
-					peerSocket = new DatagramSocket(12001);
+					peerSocket = new DatagramSocket(srcPort+1);
 					peerSocket.connect(targetAddress, nat.getPort());
 					while (ackCount < 100 && !restart) {
 						suspendStun = true;
