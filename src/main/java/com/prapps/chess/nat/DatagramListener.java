@@ -28,6 +28,7 @@ public class DatagramListener {
 			{"jstun.javawi.de","3478"},
 			{"stun4.l.google.com","19302"}
 	};
+	private static final int STUN_SERVER_INDEX = 0;
 	
 	private String id;
 	private DatagramSocket dgSocket;
@@ -60,13 +61,12 @@ public class DatagramListener {
 	}
 
 	public static void main(String[] args) throws Exception {
-		int selectedServerIndex = 0;
 		InetAddress iaddress = getLocalAddress();
 		DatagramSocket dgSocket = new DatagramSocket(new InetSocketAddress(iaddress, 14000));
 		dgSocket.setSoTimeout(100000);
 		dgSocket.setReuseAddress(true);
-		InetAddress stunServer = InetAddress.getByName(STUN_SERVERS[selectedServerIndex][0]);
-		int stunServerPort = Integer.parseInt(STUN_SERVERS[selectedServerIndex][1]);
+		InetAddress stunServer = InetAddress.getByName(STUN_SERVERS[STUN_SERVER_INDEX][0]);
+		int stunServerPort = Integer.parseInt(STUN_SERVERS[STUN_SERVER_INDEX][1]);
 		dgSocket.connect(stunServer, stunServerPort);
 		DatagramListener listener = new DatagramListener("Desky", dgSocket, stunServer, stunServerPort);
 		//while (restart) {
