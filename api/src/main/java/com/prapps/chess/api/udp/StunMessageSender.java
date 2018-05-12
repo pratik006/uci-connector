@@ -1,4 +1,4 @@
-package com.prapps.chess.nat.udp;
+package com.prapps.chess.api.udp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -7,48 +7,52 @@ import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.prapps.chess.server.config.ServerConfig;
-import com.prapps.chess.server.config.ServerConfig.StunServer;
+import com.prapps.chess.api.StunServer;
 
 import de.javawi.jstun.attribute.ChangeRequest;
 import de.javawi.jstun.header.MessageHeader;
 import de.javawi.jstun.util.UtilityException;
 
-public class MacAddressUpdaterThread implements Runnable {
-
-	private DatagramSocket dgSocket;
+public class StunMessageSender implements Runnable {
+	private DatagramSocket socket;
 	private AtomicBoolean exit;
+	private AtomicBoolean connected;
+	private AtomicReference<MessageHeader> sendMHRef;
 	private StunServer stunServer;
-	private int interval;
-	private AtomicReference<MessageHeader> sendMH;
 	
-	public MacAddressUpdaterThread(AtomicBoolean exit, DatagramSocket socket, ServerConfig serverConfig, AtomicReference<MessageHeader> sendMH) {
+	public StunMessageSender(DatagramSocket socket, AtomicBoolean exit, AtomicBoolean connected, AtomicReference<MessageHeader> sendMHRef, StunServer stunServer) {
+		this.socket = socket;
 		this.exit = exit;
-		this.dgSocket = socket;
-		this.stunServer = serverConfig.getUdpConfig().getStunServers().get(serverConfig.getUdpConfig().getSelectedIndex());
-		this.interval = serverConfig.getUdpConfig().getRefreshInterval();
-		this.sendMH = sendMH;
+		this.connected = connected;
+		this.sendMHRef = sendMHRef;
+		this.stunServer = stunServer;
 	}
 	
 	@Override
 	public void run() {
 		int timeSinceFirstTransmission = 0;
 		int timeout = 10000;
-		while (!exit.get()) {
+		while (!exit.get() && !connected.get()) {
 			try {
 				// Test 1 including response
 				MessageHeader sendMH = new MessageHeader(MessageHeader.MessageHeaderType.BindingRequest);
 				sendMH.generateTransactionID();
-				this.sendMH.set(sendMH);
+				sendMHRef.set(sendMH);
 				
 				ChangeRequest changeRequest = new ChangeRequest();
 				sendMH.addMessageAttribute(changeRequest);
 				
 				byte[] data = sendMH.getBytes();
-				DatagramPacket send = new DatagramPacket(data, data.length, InetAddress.getByName(stunServer.getHost()), stunServer.getPort());
-				//dgSocket.connect(InetAddress.getByName(stunServer.getHost()), stunServer.getPort());
-				dgSocket.send(send);
-			} catch (UtilityException | IOException ste) {
+				InetAddress stunAddress = InetAddress.getByName(stunServer.getHost());
+				DatagramPacket send = new DatagramPacket(data, data.length, stunAddress, stunServer.getPort());
+				synchronized (socket) {
+					socket.connect(stunAddress, stunServer.getPort());
+					socket.send(send);
+					socket.disconnect();	
+				}
+				Thread.sleep(5000);
+				System.out.println("stun packet sent");
+			} catch (UtilityException | IOException | InterruptedException ste) {
 				if (timeSinceFirstTransmission < 7900) {
 					System.out.println("Test 1: Socket timeout while receiving the response.");
 					timeSinceFirstTransmission += timeout;
@@ -62,7 +66,8 @@ public class MacAddressUpdaterThread implements Runnable {
 					
 				}
 			}
-			try { Thread.sleep(interval); } catch (InterruptedException e) { e.printStackTrace(); }
+			try { Thread.sleep(60000); } catch (InterruptedException e) { e.printStackTrace(); }
 		}
 	}
+
 }

@@ -2,6 +2,7 @@ package com.prapps.chess.server.config;
 
 import java.util.List;
 
+import com.prapps.chess.api.StunServer;
 import com.prapps.chess.server.Engine;
 
 public class ServerConfig {
@@ -79,24 +80,6 @@ public class ServerConfig {
 		}
 		public void setRefreshInterval(int refreshInterval) {
 			this.refreshInterval = refreshInterval;
-		}
-	}
-	
-	public static class StunServer {
-		private String host;
-		private int port;
-		
-		public String getHost() {
-			return host;
-		}
-		public void setHost(String host) {
-			this.host = host;
-		}
-		public int getPort() {
-			return port;
-		}
-		public void setPort(int port) {
-			this.port = port;
 		}
 	}
 	

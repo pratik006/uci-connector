@@ -9,7 +9,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,40 +16,38 @@ import java.util.PriorityQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.log4j.spi.ErrorCode;
-
 import com.prapps.chess.api.Message;
 import com.prapps.chess.api.NatDetail;
-import com.prapps.chess.api.RestUtil;
+import com.prapps.chess.api.udp.AbstractP2PListener;
+import com.prapps.chess.api.udp.DatagramListenerThread;
+import com.prapps.chess.api.udp.GetOtherNatThread;
+import com.prapps.chess.api.udp.HandshakeSenderThread;
 import com.prapps.chess.api.udp.PacketListener;
+import com.prapps.chess.api.udp.StunMessageListener;
+import com.prapps.chess.api.udp.StunMessageSender;
 import com.prapps.chess.nat.AbstractNetworkListener;
 import com.prapps.chess.server.config.ServerConfig;
 
-import de.javawi.jstun.attribute.ChangedAddress;
-import de.javawi.jstun.attribute.MappedAddress;
-import de.javawi.jstun.attribute.MessageAttribute;
-import de.javawi.jstun.attribute.MessageAttributeParsingException;
 import de.javawi.jstun.header.MessageHeader;
-import de.javawi.jstun.header.MessageHeaderParsingException;
-import de.javawi.jstun.util.UtilityException;
 
 public class UdpListener extends AbstractNetworkListener implements Runnable {
-	private DatagramSocket dgSocket;
+	private DatagramSocket socket;
 	
 	private static InetAddress srcAddress;
 	private int srcPort;
 	private InetAddress targetAddress;
 	private int targetPort;
 	
-	private static NatDetail otherNat;
 	private Map<String, Long> sequenceMap = new HashMap<>();
 	
 	private List<PacketListener> listeners;
+	private AtomicBoolean exit = new AtomicBoolean(false);
+	private AtomicBoolean connected = new AtomicBoolean(false);
 	private AtomicReference<MessageHeader> sendMH = new AtomicReference<MessageHeader>();
+	private static AtomicReference<NatDetail> natRef = new AtomicReference<NatDetail>();
 	
 	private long seq;
 	private PriorityQueue<Message> queue = new PriorityQueue<>();
-	private boolean connected = false;
 	
 	public UdpListener(AtomicBoolean exit, ServerConfig serverConfig) throws ClassNotFoundException, SocketException, UnknownHostException {
 		super(exit, serverConfig);
@@ -58,48 +55,14 @@ public class UdpListener extends AbstractNetworkListener implements Runnable {
 		//srcAddress = InetAddress.getByName("localhost");
 		srcAddress = getLocalAddress();
 		listeners = new ArrayList<>();
-		listeners.add(new PacketListener() {
-			@Override
-			public void onReceive(DatagramPacket receive) {
-				try {
-					MessageHeader receiveMH = new MessageHeader();
-					if (!(receiveMH.equalTransactionID(sendMH.get()))) {
-						receiveMH = MessageHeader.parseHeader(receive.getData());
-						receiveMH.parseAttributes(receive.getData());
-					}
-					
-					MappedAddress ma = (MappedAddress) receiveMH.getMessageAttribute(MessageAttribute.MessageAttributeType.MappedAddress);
-					ChangedAddress ca = (ChangedAddress) receiveMH.getMessageAttribute(MessageAttribute.MessageAttributeType.ChangedAddress);
-					ErrorCode ec = (ErrorCode) receiveMH.getMessageAttribute(MessageAttribute.MessageAttributeType.ErrorCode);
-					if (ec != null) {
-						System.out.println("Message header contains an Errorcode message attribute.");
-					}
-					if ((ma == null) || (ca == null)) {
-						System.out.println("Response does not contain a Mapped Address or Changed Address message attribute.");
-					} else {
-						System.out.println("Mapped address "+ma.getAddress().getInetAddress().getHostName()+" : "+ma.getPort());
-						if (ma != null)
-							RestUtil.updateNatDetails(serverConfig.getExternalHost(), "Desky", ma.getAddress().getInetAddress().getHostName(), ma.getPort());
-						/*if ((ma.getPort() == dgSocket.getLocalPort()) && (ma.getAddress().getInetAddress().equals(dgSocket.getLocalAddress()))) {
-							System.out.println("Node is not natted.");
-						} else {
-							System.out.println("Node is natted.");
-						}*/
-					}
-				} catch(IOException | UtilityException | MessageAttributeParsingException ex) {
-					ex.printStackTrace();
-				} catch (MessageHeaderParsingException e) {
-					e.printStackTrace();
-				}				
-			}
-		});
-		listeners.add(new PacketListener() {
+		listeners.add(new StunMessageListener(sendMH, serverConfig.getExternalHost(), "Desky"));
+		listeners.add(new AbstractP2PListener(socket, exit, connected) {
 			@Override
 			public void onReceive(DatagramPacket packet) {
 				Message msg;
 				try {
 					msg = mapper.readValue(new String(packet.getData()), Message.class);
-					//System.out.println(msg);
+					System.out.println(msg);
 					if (msg.getType() == Message.ENGINE_TYPE) {
 						if (seq+1 == msg.getSeq()) {
 							handleMessage(msg);
@@ -114,8 +77,7 @@ public class UdpListener extends AbstractNetworkListener implements Runnable {
 							queue.add(msg);
 						}	
 					} else if (msg.getType() == Message.HANDSHAKE_TYPE) {
-						seq = 0;
-						connected = true;
+						super.onReceive(packet);
 					} else if (msg.getType() == Message.AVAILABLE_ENGINE_TYPE) {
 						send(new Message(1, null, Arrays.toString(engineIds.toArray())));
 					}
@@ -127,66 +89,24 @@ public class UdpListener extends AbstractNetworkListener implements Runnable {
 		});
 	}
 
-	public void init() throws SocketException, UnknownHostException {
-		dgSocket = new DatagramSocket(new InetSocketAddress(srcAddress, srcPort));
-		//System.out.println(srcAddress+"\t"+srcPort);
-		dgSocket.setSoTimeout(10000);
-		dgSocket.setReuseAddress(true);
-		new Thread(new MacAddressUpdaterThread(exit, dgSocket, serverConfig, sendMH)).start();
-	}
-
 	@Override
 	public void run() {
 		try {
-			init();
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					while(!exit.get()) {
-						NatDetail nat = RestUtil.getOtherNatDetails(serverConfig.getExternalHost(), "lappy");
-						Calendar cal = Calendar.getInstance();
-						if (cal.getTimeInMillis() - nat.getLastUpdated() > 360000) {
-							//System.out.println("Client not online...");
-							try {
-								Thread.sleep(3000);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						} else {
-							while (!connected) {
-								try {
-									targetAddress = InetAddress.getByName(nat.getHost());
-								} catch (UnknownHostException e1) {
-									e1.printStackTrace();
-								}
-								targetPort = nat.getPort();
-								send(new Message(Message.HANDSHAKE_TYPE));
-								try {
-									Thread.sleep(1000);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-							}
-						}
-					}
-				}
-			}).start();
-			while (!exit.get()) {
-				DatagramPacket p = new DatagramPacket(new byte[2000], 2000);
-				try {
-					dgSocket.receive(p);
-					targetAddress = p.getAddress();
-					targetPort = p.getPort();
-					for (PacketListener listener : listeners) {
-						listener.onReceive(p);
-					}
-				} catch (java.net.SocketTimeoutException e1) { }
-			}
-		} catch(com.fasterxml.jackson.core.JsonParseException e1) { }
-		catch (IOException e1) {
-			e1.printStackTrace();
+			socket = new DatagramSocket(new InetSocketAddress(srcAddress, srcPort));
+			socket.setSoTimeout(10000);
+			socket.setReuseAddress(true);
+			Thread stunSender = new Thread(new StunMessageSender(socket, exit, connected, sendMH, serverConfig.getUdpConfig().getStunServers().get(serverConfig.getUdpConfig().getSelectedIndex())));stunSender.start();
+			Thread otherNatThread = new Thread(new GetOtherNatThread(connected, natRef, serverConfig.getExternalHost(), "lappy"));otherNatThread.start();
+			Thread datagramListener = new Thread(new DatagramListenerThread(socket, exit, listeners));datagramListener.start();
+			Thread handshakeerThread = new Thread(new HandshakeSenderThread(socket, natRef, exit, connected));handshakeerThread.start();
+			
+			stunSender.join();
+			otherNatThread.join();
+			datagramListener.join();
+			handshakeerThread.join();
+		} catch (SocketException | InterruptedException e) {
+			e.printStackTrace();
 		}
-		
 	}
 
 	@Override
@@ -201,7 +121,7 @@ public class UdpListener extends AbstractNetworkListener implements Runnable {
 		try {
 			buf = mapper.writeValueAsString(msg).getBytes();
 			DatagramPacket p = new DatagramPacket(buf, buf.length, targetAddress, targetPort);
-			dgSocket.send(p);
+			socket.send(p);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

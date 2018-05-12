@@ -1,6 +1,8 @@
-package com.prapps.chess.api;
+package com.prapps.chess.client.config;
 
 import java.util.List;
+
+import com.prapps.chess.api.StunServer;
 
 public class ClientConfig {
 	private UdpConfig udpConfig;
@@ -69,24 +71,6 @@ public class ClientConfig {
 		}
 		public void setRefreshInterval(int refreshInterval) {
 			this.refreshInterval = refreshInterval;
-		}
-	}
-	
-	public static class StunServer {
-		private String host;
-		private int port;
-		
-		public String getHost() {
-			return host;
-		}
-		public void setHost(String host) {
-			this.host = host;
-		}
-		public int getPort() {
-			return port;
-		}
-		public void setPort(int port) {
-			this.port = port;
 		}
 	}
 	

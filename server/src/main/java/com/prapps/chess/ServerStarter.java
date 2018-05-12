@@ -8,7 +8,7 @@ import com.prapps.chess.nat.udp.UdpListener;
 import com.prapps.chess.server.config.ServerConfig;
 import com.prapps.chess.server.config.ServerLoader;
 
-public class Starter {
+public class ServerStarter {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		ServerConfig serverConfig = ServerLoader.INSTANCE.getServerConfig();

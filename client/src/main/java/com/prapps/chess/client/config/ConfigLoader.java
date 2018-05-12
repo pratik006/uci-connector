@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prapps.chess.api.ClientConfig;
 
 public enum ConfigLoader {
 	INSTANCE;

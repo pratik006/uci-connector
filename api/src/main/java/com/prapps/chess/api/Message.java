@@ -11,6 +11,8 @@ public class Message implements Comparable<Message> {
 	private long seq;
 	private byte[] data;
 	private int type;
+	private String host;
+	private int port;
 	
 	public Message() { }
 	
@@ -66,6 +68,22 @@ public class Message implements Comparable<Message> {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 
 	@Override

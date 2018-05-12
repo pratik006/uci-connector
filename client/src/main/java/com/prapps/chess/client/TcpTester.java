@@ -7,8 +7,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prapps.chess.api.ClientConfig;
 import com.prapps.chess.api.Message;
+import com.prapps.chess.client.config.ClientConfig;
 import com.prapps.chess.client.config.ConfigLoader;
 
 public class TcpTester {

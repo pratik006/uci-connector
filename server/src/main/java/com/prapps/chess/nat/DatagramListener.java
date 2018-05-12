@@ -1,32 +1,5 @@
 package com.prapps.chess.nat;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-
-import com.prapps.chess.api.NatDetail;
-import com.prapps.chess.api.RestUtil;
-import com.prapps.chess.api.udp.PacketListener;
-//import com.prapps.chess.nat.udp.P2PMessageListener;
-import com.prapps.chess.nat.udp.StunMessageListener;
-
-import de.javawi.jstun.attribute.ChangeRequest;
-import de.javawi.jstun.attribute.MessageAttributeParsingException;
-import de.javawi.jstun.header.MessageHeader;
-import de.javawi.jstun.header.MessageHeaderParsingException;
-import de.javawi.jstun.util.UtilityException;
-
 public class DatagramListener {/*
 	
 	private static final String[][] STUN_SERVERS = new String[][] {
