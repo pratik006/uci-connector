@@ -1,2 +1,8 @@
-/target/
-/.classpath
+/**/target/
+/target/*
+/**/.class
+/**/.classpath
+/**/.project
+/**/.gitignore
+/**/.settings/*
+/**/.idea/*
