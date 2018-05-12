@@ -17,8 +17,8 @@ import java.util.List;
 
 import com.prapps.chess.api.NatDetail;
 import com.prapps.chess.api.RestUtil;
-import com.prapps.chess.nat.udp.P2PMessageListener;
-import com.prapps.chess.nat.udp.PacketListener;
+import com.prapps.chess.api.udp.PacketListener;
+//import com.prapps.chess.nat.udp.P2PMessageListener;
 import com.prapps.chess.nat.udp.StunMessageListener;
 
 import de.javawi.jstun.attribute.ChangeRequest;
@@ -27,7 +27,7 @@ import de.javawi.jstun.header.MessageHeader;
 import de.javawi.jstun.header.MessageHeaderParsingException;
 import de.javawi.jstun.util.UtilityException;
 
-public class DatagramClientListener {
+public class DatagramClientListener {/*
 	
 	private static final String[][] STUN_SERVERS = new String[][] {
 			{"jstun.javawi.de","3478"},
@@ -125,7 +125,7 @@ public class DatagramClientListener {
 	public void listen() throws IOException, InterruptedException {
 		restart = false;
 		
-		/*NatDetail nat = null;
+		NatDetail nat = null;
 		while (nat == null) {
 			try {
 				Thread.sleep(2000);
@@ -137,7 +137,7 @@ public class DatagramClientListener {
 		
 		System.out.println(nat);
 		EngineClientAdapter adapter = new EngineClientAdapter(InetAddress.getByName(nat.getHost()), nat.getPort());
-		adapter.listen();*/
+		adapter.listen();
 		
 		new Thread(new Runnable() {
 			public void run() {
@@ -229,4 +229,4 @@ public class DatagramClientListener {
 		return null;
 	}
 
-}
+*/}

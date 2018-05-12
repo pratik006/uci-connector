@@ -2,6 +2,8 @@ package com.prapps.chess.nat.udp;
 
 import java.net.DatagramPacket;
 
+import com.prapps.chess.api.udp.PacketListener;
+
 import de.javawi.jstun.header.MessageHeader;
 
 public class StunMessageListener implements PacketListener {

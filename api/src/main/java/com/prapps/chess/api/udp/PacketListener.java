@@ -1,4 +1,4 @@
-package com.prapps.chess.nat.udp;
+package com.prapps.chess.api.udp;
 
 import java.net.DatagramPacket;
 
