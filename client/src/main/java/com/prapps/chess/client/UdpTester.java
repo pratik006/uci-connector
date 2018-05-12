@@ -36,7 +36,7 @@ public class UdpTester {
 		socket.setReuseAddress(true);
 		socket.setSoTimeout(5000);
 		ObjectMapper mapper = new ObjectMapper();
-		ClientConfig serverConfig = ConfigLoader.INSTANCE.getServerConfig();
+		ClientConfig clientConfig = ConfigLoader.INSTANCE.getServerConfig();
 		AtomicReference<MessageHeader> sendMHRef = new AtomicReference<MessageHeader>();
 
 		Thread t2 = new Thread(new Runnable() {
@@ -66,7 +66,7 @@ public class UdpTester {
 								} else {
 									System.out.println("Mapped address "+ma.getAddress().getInetAddress().getHostName()+" : "+ma.getPort());
 									if (ma != null)
-										RestUtil.updateNatDetails(serverConfig.getExternalHost(), "lappy", ma.getAddress().getInetAddress().getHostName(), ma.getPort());
+										RestUtil.updateNatDetails(clientConfig.getExternalHost(), "lappy", ma.getAddress().getInetAddress().getHostName(), ma.getPort());
 								}
 							} catch (MessageHeaderParsingException | MessageAttributeParsingException | UnknownHostException | UtilityException e1) {
 								e1.printStackTrace();
@@ -99,7 +99,7 @@ public class UdpTester {
 					sendMH.addMessageAttribute(changeRequest);
 					
 					byte[] data = sendMH.getBytes();
-					InetAddress stunServer = InetAddress.getByName("jstun.javawi.de");
+					InetAddress stunServer = InetAddress.getByName(clientConfig.getUdpConfig().getStunServers().get(0).getHost());
 					DatagramPacket send = new DatagramPacket(data, data.length, stunServer, 3478);
 					socket.connect(stunServer, 3478);
 					socket.send(send);
@@ -126,7 +126,7 @@ public class UdpTester {
 			
 			
 			buf = (mapper.writeValueAsString(new Message(Message.HANDSHAKE_TYPE)) + "\n").getBytes();
-			NatDetail nat = RestUtil.getOtherNatDetails(serverConfig.getExternalHost(), "lappy");
+			NatDetail nat = RestUtil.getOtherNatDetails(clientConfig.getExternalHost(), "lappy");
 			/*InetAddress address = AbstractNetworkListener.getLocalAddress();
 			System.out.println(address.getHostName());*/
 			DatagramPacket p = new DatagramPacket(buf, buf.length, InetAddress.getByName(nat.getHost()),nat.getPort());
