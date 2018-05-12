@@ -16,6 +16,7 @@ import com.prapps.chess.api.ClientConfig;
 import com.prapps.chess.api.Message;
 import com.prapps.chess.api.NatDetail;
 import com.prapps.chess.api.RestUtil;
+import com.prapps.chess.client.config.ConfigLoader;
 
 import de.javawi.jstun.attribute.ChangeRequest;
 import de.javawi.jstun.attribute.ChangedAddress;

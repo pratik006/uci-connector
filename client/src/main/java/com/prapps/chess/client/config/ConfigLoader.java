@@ -1,4 +1,4 @@
-package com.prapps.chess.client;
+package com.prapps.chess.client.config;
 
 import java.io.FileInputStream;
 import java.io.IOException;
