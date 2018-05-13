@@ -1,10 +1,13 @@
 {
+"serverId": "Desky",
+"clientId": "lappy",
 "protocol": "udp",
 "udpConfig": {
 	"stunServers": [{"host": "jstun.javawi.de","port": 3478}, {"host": "stun4.l.google.com","port": 19302}],
 	"selectedIndex": 0,
-	"sourcePort": 12312,
-	"refreshInterval": 60000
+	"sourcePort": 12001,
+	"refreshInterval": 60000,
+	"socketTimeout": 10000
 },
 "tcpConfig": {
 	"port": 11110

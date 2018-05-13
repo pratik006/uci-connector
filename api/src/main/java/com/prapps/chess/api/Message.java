@@ -1,7 +1,5 @@
 package com.prapps.chess.api;
 
-import java.util.Arrays;
-
 public class Message implements Comparable<Message> {
 	public static final int ENGINE_TYPE = 1;
 	public static final int HANDSHAKE_TYPE = 2;
@@ -103,7 +101,7 @@ public class Message implements Comparable<Message> {
 
 	@Override
 	public String toString() {
-		return "Message [engineId=" + engineId + ", seq=" + seq + ", data=" + Arrays.toString(data) + ", type=" + type
+		return "Message [type=" + type
 				+ ", host=" + host + ", port=" + port + "]";
 	}
 }

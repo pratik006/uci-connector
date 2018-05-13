@@ -26,7 +26,7 @@ public class GetOtherNatThread implements Runnable {
 			}
 			
 			try {
-				NatDetail otherNat = RestUtil.getOtherNatDetails(ctx.getBaseConfig().getExternalHost(), ctx.getId());
+				NatDetail otherNat = RestUtil.getOtherNatDetails(ctx.getBaseConfig().getExternalHost(), ctx.getOtherId());
 				if (Calendar.getInstance().getTimeInMillis() - otherNat.getLastUpdated() < TIME_DIFF_ALLOWED) {
 					synchronized (ctx.getNat()) {
 						ctx.getNat().set(otherNat);

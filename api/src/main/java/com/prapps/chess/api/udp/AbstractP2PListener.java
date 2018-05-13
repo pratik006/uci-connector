@@ -35,9 +35,10 @@ public abstract class AbstractP2PListener implements PacketListener {
 					synchronized (ctx.getConnectionState()) {
 						ctx.getConnectionState().get().setState(State.HANDSHAKE_ONE_WAY);
 						ctx.getConnectionState().notifyAll();	
-					}	
+					}
+					ctx.send(Message.HANDSHAKE_COMNPLETE_TYPE);
 				}
-				ctx.send(Message.HANDSHAKE_COMNPLETE_TYPE);
+				
 			} else if (msg.getType() == Message.HANDSHAKE_COMNPLETE_TYPE) {
 				if (ctx.getConnectionState().get().getState() ==  State.HANDSHAKE_ONE_WAY 
 						&& ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_TWO_WAY)) {

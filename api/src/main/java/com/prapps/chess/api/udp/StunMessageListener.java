@@ -3,6 +3,9 @@ package com.prapps.chess.api.udp;
 import java.io.IOException;
 import java.net.DatagramPacket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.prapps.chess.api.RestUtil;
 
 import de.javawi.jstun.attribute.ChangedAddress;
@@ -15,6 +18,7 @@ import de.javawi.jstun.header.MessageHeaderParsingException;
 import de.javawi.jstun.util.UtilityException;
 
 public class StunMessageListener implements PacketListener {
+	private Logger LOG = LoggerFactory.getLogger(StunMessageListener.class);
 	private SharedContext ctx;
 	
 	public StunMessageListener(SharedContext ctx) {
@@ -37,8 +41,7 @@ public class StunMessageListener implements PacketListener {
 				if ((ma == null) || (ca == null)) {
 					System.out.println("Response does not contain a Mapped Address or Changed Address message attribute.");
 				} else {
-					//System.out.println("Mapped address "+ma.getAddress().getInetAddress().getHostName()+" : "+ma.getPort());
-					
+					LOG.debug("Mapped address "+ma.getAddress().getInetAddress().getHostName()+" : "+ma.getPort());
 					if (ma != null) {
 						RestUtil.updateNatDetails(ctx.getBaseConfig().getExternalHost(), ctx.getId(), 
 								ma.getAddress().getInetAddress().getHostName(), ma.getPort());

@@ -63,17 +63,17 @@ public class ServerDatagramP2pListener extends AbstractNetworkListener implement
 				}	
 			} else if (msg.getType() == Message.HANDSHAKE_TYPE) {
 				seq.set(0);
-				ctx.getNat().get().setHost(packet.getAddress().getHostName());
-				ctx.getNat().get().setPort(packet.getPort());
-				if (ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_ONE_WAY)) {
+				if (ctx.getConnectionState().get().getState() == State.MAC_UPDATED 
+						&& ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_ONE_WAY)) {
 					synchronized (ctx.getConnectionState()) {
 						ctx.getConnectionState().get().setState(State.HANDSHAKE_ONE_WAY);
-						ctx.getConnectionState().notifyAll();	
-					}	
+						ctx.getConnectionState().notifyAll();
+					}
+					ctx.send(Message.HANDSHAKE_COMNPLETE_TYPE);
 				}
-				ctx.send(Message.HANDSHAKE_COMNPLETE_TYPE);
 			} else if (msg.getType() == Message.HANDSHAKE_COMNPLETE_TYPE) {
-				if (ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_TWO_WAY)) {
+				if (ctx.getConnectionState().get().getState() == State.HANDSHAKE_ONE_WAY 
+						&& ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_TWO_WAY)) {
 					synchronized (ctx.getConnectionState()) {
 						ctx.getConnectionState().get().setState(State.HANDSHAKE_TWO_WAY);
 						ctx.getConnectionState().notifyAll();	

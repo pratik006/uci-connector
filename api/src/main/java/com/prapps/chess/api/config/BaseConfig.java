@@ -5,12 +5,26 @@ import java.util.List;
 import com.prapps.chess.api.StunServer;
 
 public class BaseConfig {
+	private String serverId;
+	private String clientId;
 	private UdpConfig udpConfig;
 	private TcpConfig tcpConfig;
 	private int tcpPort;
 	private String protocol;
 	private String externalHost;
 	
+	public String getServerId() {
+		return serverId;
+	}
+	public void setServerId(String serverId) {
+		this.serverId = serverId;
+	}
+	public String getClientId() {
+		return clientId;
+	}
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
 	public UdpConfig getUdpConfig() {
 		return udpConfig;
 	}
@@ -46,6 +60,7 @@ public class BaseConfig {
 		int selectedIndex;
 		int sourcePort;
 		int refreshInterval;
+		int socketTimeout;
 		List<StunServer> stunServers;
 		
 		public int getSelectedIndex() {
@@ -59,6 +74,12 @@ public class BaseConfig {
 		}
 		public void setSourcePort(int sourcePort) {
 			this.sourcePort = sourcePort;
+		}
+		public int getSocketTimeout() {
+			return socketTimeout;
+		}
+		public void setSocketTimeout(int socketTimeout) {
+			this.socketTimeout = socketTimeout;
 		}
 		public List<StunServer> getStunServers() {
 			return stunServers;

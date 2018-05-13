@@ -24,6 +24,7 @@ public class SharedContext {
 	
 	private static DatagramSocket socket;
 	private String id;
+	private String otherId;
 	private AtomicReference<MessageHeader> sendMHRef = new AtomicReference<MessageHeader>();
 	private BaseConfig baseConfig;
 	private AtomicBoolean exit = new AtomicBoolean(false);
@@ -43,6 +44,12 @@ public class SharedContext {
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	public String getOtherId() {
+		return otherId;
+	}
+	public void setOtherId(String otherId) {
+		this.otherId = otherId;
 	}
 	public AtomicReference<MessageHeader> getSendMHRef() {
 		return sendMHRef;
@@ -89,7 +96,9 @@ public class SharedContext {
 	
 	private void send(DatagramPacket packet) throws IOException {
 		LOG.trace("Sending Packet: "+new String(packet.getData()));
-		socket.send(packet);
+		synchronized (socket) {
+			socket.send(packet);
+		}
 	}
 	
 	public void send(Message msg) throws IOException {
@@ -111,12 +120,7 @@ public class SharedContext {
 	}
 	
 	public void connectAndSend(DatagramPacket packet) throws IOException {
-		synchronized (socket) {
-			socket.connect(packet.getAddress(), packet.getPort());
-			socket.send(packet);
-			socket.disconnect();
-			LOG.trace("Packet sent to "+packet.getAddress().getHostName()+":"+packet.getPort()+"\tData: "+new String(packet.getData()));
-		}
+		send(packet);
 	}
 	
 	public void receive(DatagramPacket p) throws IOException {

@@ -32,10 +32,11 @@ public class UdpListener implements Runnable {
 		ctx = new SharedContext();
 		int srcPort = serverConfig.getUdpConfig().getSourcePort();
 		DatagramSocket socket = new DatagramSocket(new InetSocketAddress(getLocalAddress(), srcPort));
-		socket.setSoTimeout(10000);
+		socket.setSoTimeout(serverConfig.getUdpConfig().getSocketTimeout());
 		socket.setReuseAddress(true);
 		ctx.setSocket(socket);
-		ctx.setId("Desky");
+		ctx.setId(serverConfig.getServerId());
+		ctx.setOtherId(serverConfig.getClientId());
 		ctx.setBaseConfig(serverConfig);
 		ctx.setExit(new AtomicBoolean(false));
 		ctx.setNat(new AtomicReference<NatDetail>());

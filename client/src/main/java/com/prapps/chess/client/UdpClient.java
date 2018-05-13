@@ -19,6 +19,7 @@ import com.prapps.chess.api.udp.State;
 import com.prapps.chess.api.udp.StateChangeThread;
 import com.prapps.chess.api.udp.StunMessageListener;
 import com.prapps.chess.api.udp.StunMessageSender;
+import com.prapps.chess.client.config.ClientConfig;
 import com.prapps.chess.client.config.ConfigLoader;
 
 import de.javawi.jstun.header.MessageHeader;
@@ -27,13 +28,15 @@ public class UdpClient {
 	private SharedContext ctx;
 	
 	public UdpClient() throws SocketException {
-		DatagramSocket socket = new DatagramSocket(13000);
+		ClientConfig config = ConfigLoader.INSTANCE.getClientConfig();
+		DatagramSocket socket = new DatagramSocket(config.getUdpConfig().getSourcePort());
 		socket.setReuseAddress(true);
-		socket.setSoTimeout(5000);
+		socket.setSoTimeout(config.getUdpConfig().getSocketTimeout());
 		ctx = new SharedContext();
 		ctx.setSocket(socket);
-		ctx.setId("lappy");
-		ctx.setBaseConfig(ConfigLoader.INSTANCE.getClientConfig());
+		ctx.setId(config.getClientId());
+		ctx.setOtherId(config.getServerId());
+		ctx.setBaseConfig(config);
 		ctx.setExit(new AtomicBoolean(false));
 		ctx.setNat(new AtomicReference<>());
 		ctx.setSendMHRef(new AtomicReference<MessageHeader>());
