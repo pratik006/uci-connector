@@ -3,8 +3,6 @@ package com.prapps.chess.api.udp;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,15 +32,9 @@ public class ConsoleReaderThread implements Runnable {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 			while (!ctx.getExit().get()) {
 				while (!ctx.getExit().get() && (line = reader.readLine()) != null) {
-					Message msg = new Message(seq++, "critter", line + "\n");
-					msg.setHost(ctx.getNat().get().getHost());
-					msg.setPort(ctx.getNat().get().getPort());
-					byte[] buf;
+					LOG.trace("line: "+line);
 					try {
-						buf = ctx.getObjectMapper().writeValueAsString(msg).getBytes();
-						DatagramPacket p = new DatagramPacket(buf, buf.length, 
-								InetAddress.getByName(ctx.getNat().get().getHost()), ctx.getNat().get().getPort());
-						ctx.send(p);
+						ctx.send(new Message(seq++, "critter", line + "\n"));
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

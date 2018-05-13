@@ -17,6 +17,14 @@ public class GetOtherNatThread implements Runnable {
 	@Override
 	public void run() {
 		while (!ctx.getExit().get()) {
+			while (ctx.getConnectionState().get().getState() != State.MAC_UPDATED) {
+				try {
+					synchronized (ctx.getConnectionState()) {
+						ctx.getConnectionState().wait();	
+					}
+				} catch (InterruptedException e) { e.printStackTrace(); }
+			}
+			
 			try {
 				NatDetail otherNat = RestUtil.getOtherNatDetails(ctx.getBaseConfig().getExternalHost(), ctx.getId());
 				if (Calendar.getInstance().getTimeInMillis() - otherNat.getLastUpdated() < TIME_DIFF_ALLOWED) {

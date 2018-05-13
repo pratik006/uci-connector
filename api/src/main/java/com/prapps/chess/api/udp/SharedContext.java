@@ -87,21 +87,27 @@ public class SharedContext {
 		this.listeners = listeners;
 	}
 	
-	public void send(DatagramPacket packet) throws IOException {
+	private void send(DatagramPacket packet) throws IOException {
+		LOG.trace("Sending Packet: "+new String(packet.getData()));
 		socket.send(packet);
 	}
 	
-	public void send(int msgType) throws IOException {
-		Message msg = new Message(msgType);
-		msg.setHost(getNat().get().getHost());
-		msg.setPort(getNat().get().getPort());
+	public void send(Message msg) throws IOException {
+		msg.setTimestamp(System.currentTimeMillis());
+		if (nat.get().getHost() != null && nat.get().getPort() != 0) {
+			msg.setPort(nat.get().getPort());
+			msg.setHost(nat.get().getHost());
+		}
+		
 		String json = getObjectMapper().writeValueAsString(msg);
 		DatagramPacket p = new DatagramPacket(json.getBytes(), json.getBytes().length);
-		if (msg.getHost() != null && msg.getPort() != 0) {
-			p.setPort(msg.getPort());
-			p.setAddress(InetAddress.getByName(msg.getHost()));
-		}
+		p.setPort(msg.getPort());
+		p.setAddress(InetAddress.getByName(msg.getHost()));
 		send(p);
+	}
+	
+	public void send(int msgType) throws IOException {
+		send(new Message(msgType));
 	}
 	
 	public void connectAndSend(DatagramPacket packet) throws IOException {

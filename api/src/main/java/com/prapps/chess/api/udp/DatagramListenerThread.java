@@ -21,7 +21,7 @@ public class DatagramListenerThread implements Runnable {
 			DatagramPacket p = new DatagramPacket(buf, buf.length);
 			try {
 				ctx.receive(p);
-				LOG.trace(new String("Received Packet from "+p.getAddress()+":"+p.getPort()+"\tDate: "+p.getData()));
+				LOG.trace(new String("Received Packet from "+p.getAddress()+":"+p.getPort()+"\tDate: "+new String(p.getData())));
 				ctx.getListeners().forEach(listener -> listener.onReceive(p));
 			} catch(java.net.SocketTimeoutException e) { }
 			catch (IOException e) {

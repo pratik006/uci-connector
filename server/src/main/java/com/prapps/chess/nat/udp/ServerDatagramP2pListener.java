@@ -43,6 +43,11 @@ public class ServerDatagramP2pListener extends AbstractNetworkListener implement
 		try {
 			msg = mapper.readValue(new String(packet.getData()), Message.class);
 			LOG.debug("P2P server msg: "+msg);
+			if (System.currentTimeMillis() - msg.getTimestamp() > 30000) {
+				LOG.debug("Old packet, discarding");
+				return;
+			}
+			
 			if (msg.getType() == Message.ENGINE_TYPE) {
 				if (seq.get()+1 == msg.getSeq()) {
 					handleMessage(msg);

@@ -23,11 +23,15 @@ public abstract class AbstractP2PListener implements PacketListener {
 		try {
 			msg = ctx.getObjectMapper().readValue(new String(packet.getData()), Message.class);
 			LOG.debug("P2P client: "+msg);
-			 if (msg.getType() == Message.HANDSHAKE_TYPE) {
+			if (System.currentTimeMillis() - msg.getTimestamp() > 10000) {
+				LOG.debug("Old packet, discarding");
+				return;
+			}
+			
+			if (msg.getType() == Message.HANDSHAKE_TYPE) {
 				seq = 0;
-				ctx.getNat().get().setHost(packet.getAddress().getHostName());
-				ctx.getNat().get().setPort(packet.getPort());
-				if (ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_ONE_WAY)) {
+				if (ctx.getConnectionState().get().getState() ==  State.MAC_UPDATED 
+						&& ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_ONE_WAY)) {
 					synchronized (ctx.getConnectionState()) {
 						ctx.getConnectionState().get().setState(State.HANDSHAKE_ONE_WAY);
 						ctx.getConnectionState().notifyAll();	
@@ -35,7 +39,8 @@ public abstract class AbstractP2PListener implements PacketListener {
 				}
 				ctx.send(Message.HANDSHAKE_COMNPLETE_TYPE);
 			} else if (msg.getType() == Message.HANDSHAKE_COMNPLETE_TYPE) {
-				if (ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_TWO_WAY)) {
+				if (ctx.getConnectionState().get().getState() ==  State.HANDSHAKE_ONE_WAY 
+						&& ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_TWO_WAY)) {
 					synchronized (ctx.getConnectionState()) {
 						ctx.getConnectionState().get().setState(State.HANDSHAKE_TWO_WAY);
 						ctx.getConnectionState().notifyAll();	

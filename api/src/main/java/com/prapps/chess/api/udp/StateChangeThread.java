@@ -1,8 +1,6 @@
 package com.prapps.chess.api.udp;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +40,7 @@ public class StateChangeThread implements Runnable {
 				LOG.debug("Recvd Other Nat "+ctx.getNat());
 				while (ctx.getConnectionState().get().getState() == State.RECEIVED_OTHER_MAC) {
 					try {
-						send(Message.HANDSHAKE_TYPE);
+						ctx.send(Message.HANDSHAKE_TYPE);
 						Thread.sleep(1000);	
 					} catch (InterruptedException | IOException e) {
 						e.printStackTrace();
@@ -53,7 +51,7 @@ public class StateChangeThread implements Runnable {
 				LOG.debug("one way handshake");
 				while (ctx.getConnectionState().get().getState() == State.HANDSHAKE_ONE_WAY) {
 					try {
-						send(Message.HANDSHAKE_COMNPLETE_TYPE);
+						ctx.send(Message.HANDSHAKE_COMNPLETE_TYPE);
 						Thread.sleep(2000);
 					} catch (IOException | InterruptedException e) {
 						e.printStackTrace();
@@ -67,18 +65,4 @@ public class StateChangeThread implements Runnable {
 			
 		}
 	}
-	
-	private void send(int msgType) throws IOException {
-		Message msg = new Message(msgType);
-		msg.setHost(ctx.getNat().get().getHost());
-		msg.setPort(ctx.getNat().get().getPort());
-		String json = ctx.getObjectMapper().writeValueAsString(msg);
-		DatagramPacket p = new DatagramPacket(json.getBytes(), json.getBytes().length);
-		if (msg.getHost() != null && msg.getPort() != 0) {
-			p.setPort(msg.getPort());
-			p.setAddress(InetAddress.getByName(msg.getHost()));
-		}
-		ctx.send(p);
-	}
-
 }
