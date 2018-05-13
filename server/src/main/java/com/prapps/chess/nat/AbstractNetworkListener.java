@@ -9,27 +9,28 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prapps.chess.api.Message;
+import com.prapps.chess.api.udp.SharedContext;
 import com.prapps.chess.server.EngineController;
 import com.prapps.chess.server.config.ServerConfig;
 
 public abstract class AbstractNetworkListener implements Runnable {
 	protected LinkedList<Message> output = new LinkedList<>();
-	protected AtomicBoolean exit;
 	protected ServerConfig serverConfig;
 	protected ObjectMapper mapper = new ObjectMapper();
 	protected EngineController engineController;
 	protected Set<String> engineIds = new HashSet<>();
 	
-	public AbstractNetworkListener(AtomicBoolean exit, ServerConfig serverConfig) {
-		this.exit  = exit;
+	protected SharedContext ctx;
+	
+	public AbstractNetworkListener(SharedContext ctx, ServerConfig serverConfig) {
 		this.serverConfig = serverConfig;
 		this.engineController = EngineController.INSTANCE;
 		this.engineController.setOutput(output);
 		this.serverConfig.getServers().stream().forEach(server -> engineIds.add(server.getId()));
+		this.ctx = ctx;
 		listenEngine();
 	}
 	
@@ -37,8 +38,8 @@ public abstract class AbstractNetworkListener implements Runnable {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (!exit.get()) {
-					while (!exit.get() && output.isEmpty()) {
+				while (!ctx.getExit().get()) {
+					while (!ctx.getExit().get() && output.isEmpty()) {
 						synchronized (output) {
 							try {
 								output.wait(1000);

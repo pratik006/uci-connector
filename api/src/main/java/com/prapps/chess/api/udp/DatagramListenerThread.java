@@ -2,29 +2,27 @@ package com.prapps.chess.api.udp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DatagramListenerThread implements Runnable {
-	private DatagramSocket socket;
-	private  AtomicBoolean exit;
-	private List<PacketListener> listeners;
+	private Logger LOG = LoggerFactory.getLogger(StateChangeThread.class);
+	private SharedContext ctx;
 	
-	public DatagramListenerThread(DatagramSocket socket, AtomicBoolean exit, List<PacketListener> listeners) {
-		this.socket = socket;
-		this.exit = exit;
-		this.listeners = listeners;
+	public DatagramListenerThread(SharedContext ctx) {
+		this.ctx = ctx;
 	}
 	
 	@Override
 	public void run() {
-		while (!exit.get()) {
+		while (!ctx.getExit().get()) {
 			byte[] buf = new byte[2000];
 			DatagramPacket p = new DatagramPacket(buf, buf.length);
 			try {
-				socket.receive(p);
-				listeners.forEach(listener -> listener.onReceive(p));
+				ctx.receive(p);
+				LOG.trace(new String("Received Packet from "+p.getAddress()+":"+p.getPort()+"\tDate: "+p.getData()));
+				ctx.getListeners().forEach(listener -> listener.onReceive(p));
 			} catch(java.net.SocketTimeoutException e) { }
 			catch (IOException e) {
 				e.printStackTrace();

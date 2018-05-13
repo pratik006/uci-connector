@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public enum ConfigLoader {
 	INSTANCE;
-	private ClientConfig serverConfig;
+	private ClientConfig clientConfig;
 	
 	private ConfigLoader() {
 		try(FileInputStream fis = new FileInputStream("clientConfig.json")) {
@@ -19,14 +19,14 @@ public enum ConfigLoader {
 			}
 			
 			ObjectMapper mapper = new ObjectMapper();
-			serverConfig =  mapper.readValue(json.toString(), ClientConfig.class);
+			clientConfig =  mapper.readValue(json.toString(), ClientConfig.class);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public ClientConfig getServerConfig() {
-		return serverConfig;
+	public ClientConfig getClientConfig() {
+		return clientConfig;
 	}
 	
 	public static void main(String[] args) throws IOException {

@@ -1,8 +1,10 @@
-package com.prapps.chess.api;
+package com.prapps.chess.api.config;
 
 import java.util.List;
 
-public class ClientConfig {
+import com.prapps.chess.api.StunServer;
+
+public class BaseConfig {
 	private UdpConfig udpConfig;
 	private TcpConfig tcpConfig;
 	private int tcpPort;

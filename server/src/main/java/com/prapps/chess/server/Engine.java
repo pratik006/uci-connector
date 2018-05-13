@@ -3,15 +3,17 @@ package com.prapps.chess.server;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.sun.org.apache.xml.internal.serialize.LineSeparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Engine extends BasicServer {
+	private Logger LOG = LoggerFactory.getLogger(Engine.class);
 	
 	public static final boolean STOPED = false;
 	public static final boolean STARTED = true;
 	public static final String ATTRIBUTE_SEPERATOR = ",";
-	public static final String ENGINE_STOP_COMMAND = "quit"+LineSeparator.Windows;
+	public static final String ENGINE_STOP_COMMAND = "quit\n";
 	
 	private Process process;
 	
@@ -41,19 +43,12 @@ public class Engine extends BasicServer {
 	}
 	
 	public boolean selfTest() {
-		byte[] buffer = new byte[1024*10];
-        int readLen = buffer.length;
         StringBuilder sb = new StringBuilder();
         String idName;
         try {
             start();
             write("uci\r\n".getBytes());
             Thread.sleep(500);
-            /*readLen = buffer.length;
-            while(readLen >= buffer.length && (readLen = process.getInputStream().read(buffer)) > 0) {
-                sb.append(new String(buffer, 0, readLen));
-            }
-            System.out.println(sb);*/
             write(ENGINE_STOP_COMMAND.getBytes());
             if(sb.toString().indexOf("id name") != -1) {
                 idName = sb.toString().substring(sb.toString().indexOf("id name")+"id name".length(), sb.toString().length()-1);
@@ -90,7 +85,7 @@ public class Engine extends BasicServer {
 	
 	public void start() throws IOException {
 		if(state != STARTED) {
-			System.out.println("Starting engine at "+path);
+			LOG.debug("Starting engine at "+path);
 			process = Runtime.getRuntime().exec(path);
 			state = STARTED;
 		}
@@ -102,7 +97,7 @@ public class Engine extends BasicServer {
 			process.getOutputStream().flush();
 			process.destroy();
 			state = STOPED;
-			System.out.println("process stopped successfully !");
+			LOG.debug("process stopped successfully !");
 		}	
 		else {
 			//System.out.println("process was not started");

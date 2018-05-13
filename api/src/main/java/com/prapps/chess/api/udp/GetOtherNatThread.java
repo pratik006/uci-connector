@@ -1,42 +1,39 @@
 package com.prapps.chess.api.udp;
 
+import static com.prapps.chess.api.udp.SharedContext.TIME_DIFF_ALLOWED;
+import static com.prapps.chess.api.udp.State.*;
 import java.util.Calendar;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.prapps.chess.api.NatDetail;
 import com.prapps.chess.api.RestUtil;
 
 public class GetOtherNatThread implements Runnable {
-	private static int TIME_DIFF_ALLOWED = 5*60*1000;
+	private SharedContext ctx;
 	
-	private AtomicBoolean exit;
-	private String externalHost;
-	private String otherId;
-	private AtomicReference<NatDetail> natRef;
-	
-	public GetOtherNatThread(AtomicBoolean exit, AtomicReference<NatDetail> natRef, String externalHost, String otherId) {
-		this.exit = exit;
-		this.natRef = natRef;
-		this.externalHost = externalHost;
-		this.otherId = otherId;
+	public GetOtherNatThread(SharedContext ctx) {
+		this.ctx = ctx;
 	}
 	
 	@Override
 	public void run() {
-		while (!exit.get()) {
+		while (!ctx.getExit().get()) {
 			try {
-				NatDetail otherNat = RestUtil.getOtherNatDetails(externalHost, otherId);
+				NatDetail otherNat = RestUtil.getOtherNatDetails(ctx.getBaseConfig().getExternalHost(), ctx.getId());
 				if (Calendar.getInstance().getTimeInMillis() - otherNat.getLastUpdated() < TIME_DIFF_ALLOWED) {
-					natRef.set(otherNat);
-					synchronized (natRef) {
-						natRef.notifyAll();	
+					synchronized (ctx.getNat()) {
+						ctx.getNat().set(otherNat);
+						ctx.getNat().notifyAll();	
 					}
-					System.out.println(natRef.get());
+					if (ctx.getConnectionState().get().isHigherState(RECEIVED_OTHER_MAC)) {
+						synchronized (ctx.getConnectionState()) {
+							ctx.getConnectionState().get().setState(RECEIVED_OTHER_MAC);
+							ctx.getConnectionState().notifyAll();
+						}	
+					}
 					Thread.sleep(TIME_DIFF_ALLOWED - Calendar.getInstance().getTimeInMillis() + otherNat.getLastUpdated());
 				} else {
 					System.out.println("Other computer is not online");
-					Thread.sleep(1000);	
+					Thread.sleep(5000);	
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();

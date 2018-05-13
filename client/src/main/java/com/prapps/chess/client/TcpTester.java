@@ -15,15 +15,16 @@ public class TcpTester {
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
-		ClientConfig serverConfig = ConfigLoader.INSTANCE.getServerConfig();
-		Socket s = new Socket("localhost", serverConfig.getTcpPort());
-		s.getOutputStream().write((mapper.writeValueAsString(new Message(1, "critter", "uci"))+"\n").getBytes());
-		s.getOutputStream().write((mapper.writeValueAsString(new Message(1, "critter", "isready"))+"\n").getBytes());
-		
-		BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8"));
-		System.out.println(new String(mapper.readValue(reader.readLine(), Message.class).getData()));
-		System.out.println(new String(mapper.readValue(reader.readLine(), Message.class).getData()));
-		System.out.println(new String(mapper.readValue(reader.readLine(), Message.class).getData()));
+		ClientConfig serverConfig = ConfigLoader.INSTANCE.getClientConfig();
+		try (Socket s = new Socket("localhost", serverConfig.getTcpPort())) {
+			s.getOutputStream().write((mapper.writeValueAsString(new Message(1, "critter", "uci"))+"\n").getBytes());
+			s.getOutputStream().write((mapper.writeValueAsString(new Message(1, "critter", "isready"))+"\n").getBytes());
+			
+			BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8"));
+			System.out.println("TcpTester"+new String(mapper.readValue(reader.readLine(), Message.class).getData()));
+			System.out.println("TcpTester"+new String(mapper.readValue(reader.readLine(), Message.class).getData()));
+			System.out.println("TcpTester"+new String(mapper.readValue(reader.readLine(), Message.class).getData()));	
+		}
 	}
 
 }

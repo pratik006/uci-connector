@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.prapps.chess.api.Message;
+import com.prapps.chess.api.udp.SharedContext;
 import com.prapps.chess.nat.AbstractNetworkListener;
 import com.prapps.chess.server.config.ServerConfig;
 
@@ -16,8 +16,8 @@ public class TcpNetworkListener extends AbstractNetworkListener {
 	protected ServerSocket adminServerSocket;
 	private Socket clientSocket;
 	
-	public TcpNetworkListener(ServerConfig serverConfig, AtomicBoolean exit) {
-		super(exit, serverConfig);
+	public TcpNetworkListener(SharedContext ctx, ServerConfig serverConfig) {
+		super(ctx, serverConfig);
 	}
 
 	public void send(Message msg) {

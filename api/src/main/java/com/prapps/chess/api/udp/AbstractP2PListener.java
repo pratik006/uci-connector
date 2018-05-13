@@ -2,38 +2,44 @@ package com.prapps.chess.api.udp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.prapps.chess.api.Message;
 
 public abstract class AbstractP2PListener implements PacketListener {
-	protected ObjectMapper mapper = new ObjectMapper();
+	private Logger LOG = LoggerFactory.getLogger(AbstractP2PListener.class);
 	protected long seq;
+	protected SharedContext ctx;
 	
-	protected AtomicBoolean exit;
-	protected AtomicBoolean connected;
-	protected DatagramSocket socket;
-	
-	public AbstractP2PListener(DatagramSocket socket, AtomicBoolean exit, AtomicBoolean connected) {
-		this.exit = exit;
-		this.connected = connected;
-		this.socket = socket;
+	public AbstractP2PListener(SharedContext ctx) {
+		this.ctx = ctx;
 	}
 	
 	@Override
 	public void onReceive(DatagramPacket packet) {
 		Message msg;
 		try {
-			msg = mapper.readValue(new String(packet.getData()), Message.class);
-			if (msg.getType() == Message.HANDSHAKE_TYPE) {
+			msg = ctx.getObjectMapper().readValue(new String(packet.getData()), Message.class);
+			LOG.debug("P2P client: "+msg);
+			 if (msg.getType() == Message.HANDSHAKE_TYPE) {
 				seq = 0;
-				connected.set(true);
-				socket.disconnect();
-				System.out.println("connected..");
-				synchronized (connected) {
-					connected.notifyAll();	
+				ctx.getNat().get().setHost(packet.getAddress().getHostName());
+				ctx.getNat().get().setPort(packet.getPort());
+				if (ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_ONE_WAY)) {
+					synchronized (ctx.getConnectionState()) {
+						ctx.getConnectionState().get().setState(State.HANDSHAKE_ONE_WAY);
+						ctx.getConnectionState().notifyAll();	
+					}	
+				}
+				ctx.send(Message.HANDSHAKE_COMNPLETE_TYPE);
+			} else if (msg.getType() == Message.HANDSHAKE_COMNPLETE_TYPE) {
+				if (ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_TWO_WAY)) {
+					synchronized (ctx.getConnectionState()) {
+						ctx.getConnectionState().get().setState(State.HANDSHAKE_TWO_WAY);
+						ctx.getConnectionState().notifyAll();	
+					}	
 				}
 			}
 		} catch(com.fasterxml.jackson.core.JsonParseException e) {} 

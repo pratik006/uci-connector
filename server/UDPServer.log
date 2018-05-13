@@ -1,0 +1,86 @@
+Binding Response received.
+Message Attribute: Mapped Address parsed: Address 183.83.195.90, Port 9668.
+Message Attribute: Source Address parsed: Address 188.68.34.62, Port 3478.
+Message Attribute: Changed Address parsed: Address 188.68.62.165, Port 3479.
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines//critter_1.6a_linux/critter-16a-64bit
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/stockfish-dd-src/stockfish
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/komodo3-linux/komodo3
+stun packet sent
+Binding Response received.
+Message Attribute: Mapped Address parsed: Address 183.83.195.90, Port 9668.
+Message Attribute: Source Address parsed: Address 188.68.34.62, Port 3478.
+Message Attribute: Changed Address parsed: Address 188.68.62.165, Port 3479.
+Current State: 1
+Mac address updated
+Current State: 2
+Recvd Other Nat {id: Desky, host: 183.83.195.90, port: 9668, lastUpdated: 1526196181989}
+stun packet sent
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines//critter_1.6a_linux/critter-16a-64bit
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/stockfish-dd-src/stockfish
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/komodo3-linux/komodo3
+Current State: 2
+Recvd Other Nat {id: Desky, host: 183.83.195.90, port: 9668, lastUpdated: 1526196181989}
+stun packet sent
+Binding Response received.
+Message Attribute: Mapped Address parsed: Address 183.83.195.90, Port 9668.
+Message Attribute: Source Address parsed: Address 188.68.34.62, Port 3478.
+Message Attribute: Changed Address parsed: Address 188.68.62.165, Port 3479.
+Current State: 4
+Handshake complete
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines//critter_1.6a_linux/critter-16a-64bit
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/stockfish-dd-src/stockfish
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/komodo3-linux/komodo3
+Current State: 2
+Recvd Other Nat {id: Desky, host: 183.83.195.90, port: 9668, lastUpdated: 1526196313071}
+stun packet sent
+Binding Response received.
+Message Attribute: Mapped Address parsed: Address 183.83.195.90, Port 9668.
+Message Attribute: Source Address parsed: Address 188.68.34.62, Port 3478.
+Message Attribute: Changed Address parsed: Address 188.68.62.165, Port 3479.
+Current State: 4
+Handshake complete
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines//critter_1.6a_linux/critter-16a-64bit
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/stockfish-dd-src/stockfish
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/komodo3-linux/komodo3
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines//critter_1.6a_linux/critter-16a-64bit
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/stockfish-dd-src/stockfish
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/komodo3-linux/komodo3
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines//critter_1.6a_linux/critter-16a-64bit
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/stockfish-dd-src/stockfish
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/komodo3-linux/komodo3
+Current State: 2
+Recvd Other Nat {id: Desky, host: 183.83.195.90, port: 9668, lastUpdated: 1526196344958}
+stun packet sent
+Binding Response received.
+Message Attribute: Mapped Address parsed: Address 183.83.195.90, Port 9668.
+Message Attribute: Source Address parsed: Address 188.68.34.62, Port 3478.
+Message Attribute: Changed Address parsed: Address 188.68.62.165, Port 3479.
+Current State: 4
+Handshake complete
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines//critter_1.6a_linux/critter-16a-64bit
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/stockfish-dd-src/stockfish
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/komodo3-linux/komodo3
+stun packet sent
+Binding Response received.
+Message Attribute: Mapped Address parsed: Address 183.83.195.90, Port 11724.
+Message Attribute: Source Address parsed: Address 188.68.34.62, Port 3478.
+Message Attribute: Changed Address parsed: Address 188.68.62.165, Port 3479.
+Current State: 1
+Mac address updated
+Current State: 2
+Recvd Other Nat {id: Desky, host: 183.83.195.90, port: 11724, lastUpdated: 1526197501395}
+stun packet sent
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines//critter_1.6a_linux/critter-16a-64bit
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/stockfish-dd-src/stockfish
+Starting engine at /media/pratik/Backup/programming/Chess/ChessEngines/komodo3-linux/komodo3
+Current State: 2
+Recvd Other Nat {id: Desky, host: 183.83.195.90, port: 11724, lastUpdated: 1526197501395}
+stun packet sent
+P2P server msg: Message [engineId=null, seq=0, data=null, type=2, host=183.83.195.90, port=11724]
+P2P server msg: Message [engineId=null, seq=0, data=null, type=3, host=183.83.195.90, port=11724]
+Binding Response received.
+Message Attribute: Mapped Address parsed: Address 183.83.195.90, Port 11724.
+Message Attribute: Source Address parsed: Address 188.68.34.62, Port 3478.
+Message Attribute: Changed Address parsed: Address 188.68.62.165, Port 3479.
+Current State: 4
+Handshake complete
