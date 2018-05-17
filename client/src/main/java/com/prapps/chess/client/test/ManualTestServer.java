@@ -12,10 +12,10 @@ public class ManualTestServer extends AbstractNetworkBase {
 
 	public static void main(String[] args) throws Exception {
 		InetAddress address = getLocalAddress();
-		DatagramSocket socket1 = new DatagramSocket(new InetSocketAddress(address, 12001));
+		DatagramSocket socket1 = new DatagramSocket(new InetSocketAddress(address, 12000));
 		updateMacAddress(socket1, "Desky");
 		NatDetail otherNat = RestUtil.getOtherNatDetails("lappy");
-		
+		System.out.println(otherNat);
 		ManualTestClient test = new ManualTestClient("Desky");
 		test.start(socket1, otherNat);	
 	}

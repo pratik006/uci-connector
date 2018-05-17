@@ -10,29 +10,31 @@ import com.prapps.chess.api.NatDetail;
 import com.prapps.chess.api.RestUtil;
 import com.prapps.chess.api.udp.AbstractNetworkBase;
 
-public class ManualTest2 extends AbstractNetworkBase {
+public class ManualTestClient extends AbstractNetworkBase {
 	private String id;
+	private boolean exit;
 	
-	public ManualTest2(String id) {
+	public ManualTestClient(String id) {
 		this.id = id;
 	}
 	
 	public static void main(String[] args) throws Exception {
 		InetAddress address = getLocalAddress();
-		System.out.println(address);
-		DatagramSocket socket1 = new DatagramSocket(new InetSocketAddress(address, 12000));
-		updateMacAddress(socket1, "Desky");
-		NatDetail otherNat = RestUtil.getOtherNatDetails("lappy");
+		DatagramSocket socket2 = new DatagramSocket(new InetSocketAddress(address, 12001));
+		updateMacAddress(socket2, "lappy");
+		NatDetail serverNat = RestUtil.getOtherNatDetails("Desky");
 		
-		ManualTest2 test2 = new ManualTest2("Server");
-		test2.start(socket1, otherNat);	
+		System.out.println(serverNat);
+		
+		ManualTestClient test1 = new ManualTestClient("lappy");
+		test1.start(socket2, serverNat);
 	}
 	
 	public void start(DatagramSocket socket, NatDetail otherNat) {
 		Thread t2 = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (true) {
+				while (!exit) {
 					byte[] buf = new byte[2000];
 					DatagramPacket p = new DatagramPacket(buf, buf.length);
 					try {
@@ -56,6 +58,7 @@ public class ManualTest2 extends AbstractNetworkBase {
 						socket.send(p);
 						Thread.sleep(1000);
 					}
+					exit = true;
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
