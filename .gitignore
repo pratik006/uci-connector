@@ -6,4 +6,4 @@
 /**/.gitignore
 /**/.settings/*
 /**/.idea/*
-/**/*.log
+/**/*.log*
