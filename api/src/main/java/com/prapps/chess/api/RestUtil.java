@@ -34,6 +34,11 @@ public class RestUtil {
 		//System.out.println(response.getEntity(NatDetail.class));
 	}
 	
+	
+	public static NatDetail getOtherNatDetails(String id) {
+		return getOtherNatDetails("https://speech-translator-44168.firebaseio.com/", id);
+	}
+	
 	public static NatDetail getOtherNatDetails(String externalHost, String id) {
 		ClientConfig cc = new DefaultClientConfig();
 		cc.getClasses().add(JacksonJsonProvider.class);

@@ -1,17 +1,15 @@
-package com.prapps.chess.client.test;
+package com.prapps.chess.api.udp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 
-import com.prapps.chess.api.NatDetail;
 import com.prapps.chess.api.RestUtil;
 
 import de.javawi.jstun.attribute.ChangeRequest;
@@ -24,92 +22,8 @@ import de.javawi.jstun.header.MessageHeader;
 import de.javawi.jstun.header.MessageHeaderParsingException;
 import de.javawi.jstun.util.UtilityException;
 
-public class ManualTest {
-	private static DatagramSocket socket1;
-	private static DatagramSocket socket2;
-	private static MappedAddress ma1;
-	private static MappedAddress ma2;
-	
-	public static void main(String[] args) throws Exception {
-		InetAddress address = getLocalAddress();
-		DatagramSocket socket1 = new DatagramSocket(new InetSocketAddress(address, 12000));
-		DatagramSocket socket2 = new DatagramSocket(new InetSocketAddress(address, 12001));
-		MappedAddress serverAddress = updateMacAddress(socket1, "Desky");
-		MappedAddress clientAddress = updateMacAddress(socket2, "lappy");
-		NatDetail clientNat = RestUtil.getOtherNatDetails("lappy");
-		NatDetail serverNat = RestUtil.getOtherNatDetails("Desky");
-		
-		System.out.println(clientNat+" vs "+clientAddress.getPort());
-		System.out.println(serverNat+" vs "+serverAddress.getPort());
-		
-		ManualTest2 test1 = new ManualTest2("Desky");
-		test1.start(socket1, clientNat);
-		ManualTest2 test2 = new ManualTest2("lappy");
-		test2.start(socket2, serverNat);
-	}
-	
-	public static void main1(String[] args) throws Exception {
-		InetAddress address = getLocalAddress();
-		System.out.println(address);
-		socket1 = new DatagramSocket(new InetSocketAddress(address, 12000));
-		socket2 = new DatagramSocket(new InetSocketAddress(address, 12001));
-		ma1 = updateMacAddress(socket1, "Desky");
-		ma2 = updateMacAddress(socket2, "lappy");
-		
-		Thread t1 = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (true) {
-					byte[] buf = new byte[2000];
-					DatagramPacket p = new DatagramPacket(buf, buf.length);
-					try {
-						socket1.receive(p);
-						System.out.println("Recvd socket1 (port "+socket1.getLocalPort()+") "+new String(p.getData()));
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		});t1.start(); 
-		
-		Thread t2 = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (true) {
-					byte[] buf = new byte[2000];
-					DatagramPacket p = new DatagramPacket(buf, buf.length);
-					try {
-						socket2.receive(p);
-						System.out.println("Recvd socket2 (port "+socket2.getLocalPort()+") "+new String(p.getData()));
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		});t2.start();
-		
-		String m1 = "hello from T1";
-		String m2 = "hello from T2";
-		for (int i=0;i<10;i++) {
-			byte[] buf = (m1+" from S1 "+ma1.getPort()+"--- "+socket1.getLocalPort()).getBytes();
-			DatagramPacket p = new DatagramPacket(buf, buf.length);
-			p.setPort(ma1.getPort());
-			p.setAddress(ma1.getAddress().getInetAddress());
+public class AbstractNetworkBase {
 
-			socket1.send(p);
-			buf = (m2+" from S2 "+ma2.getPort()+" --- "+socket2.getLocalPort()).getBytes();
-			p.setPort(ma2.getPort());
-			p.setAddress(ma2.getAddress().getInetAddress());
-			p.setData(buf);
-			socket2.send(p);
-		}
-		
-		t1.join();
-		t2.join();
-		socket1.close();
-		socket2.close();
-	}
-	
 	public static InetAddress getLocalAddress() throws ClassNotFoundException, SocketException {
 		Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
 		while (ifaces.hasMoreElements()) {
@@ -128,7 +42,7 @@ public class ManualTest {
 		return null;
 	}
 	
-	private static MappedAddress updateMacAddress(DatagramSocket dgSocket, String id) throws UtilityException, SocketException, UnknownHostException, IOException, MessageAttributeParsingException, MessageHeaderParsingException, InterruptedException {
+	protected static MappedAddress updateMacAddress(DatagramSocket dgSocket, String id) throws UtilityException, SocketException, UnknownHostException, IOException, MessageAttributeParsingException, MessageHeaderParsingException, InterruptedException {
 		int timeSinceFirstTransmission = 0;
 		int timeout = 10000;
 		while (true) {
@@ -195,5 +109,4 @@ public class ManualTest {
 			return null;
 		}
 	}
-
 }
