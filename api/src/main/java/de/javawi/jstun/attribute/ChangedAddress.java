@@ -24,7 +24,7 @@ public class ChangedAddress extends MappedResponseChangedSourceAddressReflectedF
 	public static MessageAttribute parse(byte[] data) throws MessageAttributeParsingException {
 		ChangedAddress ca = new ChangedAddress();
 		MappedResponseChangedSourceAddressReflectedFrom.parse(ca, data);
-		LOGGER.debug("Message Attribute: Changed Address parsed: " + ca.toString() + ".");
+		LOGGER.trace("Message Attribute: Changed Address parsed: " + ca.toString() + ".");
 		return ca;
 	}
 }

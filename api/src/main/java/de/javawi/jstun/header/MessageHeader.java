@@ -169,8 +169,8 @@ public class MessageHeader implements MessageHeaderInterface {
 			System.arraycopy(data, 0, typeArray, 0, 2);
 			int type = Utility.twoBytesToInteger(typeArray);
 			switch (type) {
-				case BINDINGREQUEST: mh.setType(MessageHeaderType.BindingRequest); LOGGER.debug("Binding Request received."); break;
-				case BINDINGRESPONSE: mh.setType(MessageHeaderType.BindingResponse); LOGGER.debug("Binding Response received."); break;
+				case BINDINGREQUEST: mh.setType(MessageHeaderType.BindingRequest); LOGGER.trace("Binding Request received."); break;
+				case BINDINGRESPONSE: mh.setType(MessageHeaderType.BindingResponse); LOGGER.trace("Binding Response received."); break;
 				case BINDINGERRORRESPONSE: mh.setType(MessageHeaderType.BindingErrorResponse); LOGGER.debug("Binding Error Response received."); break;
 				case SHAREDSECRETREQUEST: mh.setType(MessageHeaderType.SharedSecretRequest); LOGGER.debug("Shared Secret Request received."); break;
 				case SHAREDSECRETRESPONSE: mh.setType(MessageHeaderType.SharedSecretResponse); LOGGER.debug("Shared Secret Response received."); break;

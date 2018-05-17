@@ -24,7 +24,7 @@ public class SourceAddress extends MappedResponseChangedSourceAddressReflectedFr
 	public static MessageAttribute parse(byte[] data) throws MessageAttributeParsingException {
 		SourceAddress sa = new SourceAddress();
 		MappedResponseChangedSourceAddressReflectedFrom.parse(sa, data);
-		LOGGER.debug("Message Attribute: Source Address parsed: " + sa.toString() + ".");
+		LOGGER.trace("Message Attribute: Source Address parsed: " + sa.toString() + ".");
 		return sa;
 	}
 }
