@@ -2,70 +2,42 @@ package com.prapps.chess.client;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prapps.chess.api.Message;
 import com.prapps.chess.api.udp.AbstractP2PListener;
+import com.prapps.chess.api.udp.AbstractUdpBase;
 import com.prapps.chess.api.udp.ConsoleReaderThread;
 import com.prapps.chess.api.udp.DatagramListenerThread;
 import com.prapps.chess.api.udp.GetOtherNatThread;
 import com.prapps.chess.api.udp.SharedContext;
-import com.prapps.chess.api.udp.State;
 import com.prapps.chess.api.udp.StateChangeThread;
-import com.prapps.chess.api.udp.StunMessageListener;
 import com.prapps.chess.api.udp.StunMessageSender;
 import com.prapps.chess.client.config.ClientConfig;
 import com.prapps.chess.client.config.ConfigLoader;
 
-import de.javawi.jstun.header.MessageHeader;
-
-public class UdpClient {
-	private SharedContext ctx;
-	
-	public UdpClient() throws SocketException {
-		ClientConfig config = ConfigLoader.INSTANCE.getClientConfig();
-		DatagramSocket socket = new DatagramSocket(config.getUdpConfig().getSourcePort());
-		//socket.setReuseAddress(true);
-		//socket.setSoTimeout(config.getUdpConfig().getSocketTimeout());
-		ctx = new SharedContext();
-		ctx.setSocket(socket);
-		ctx.setId(config.getClientId());
-		ctx.setOtherId(config.getServerId());
-		ctx.setBaseConfig(config);
-		ctx.setExit(new AtomicBoolean(false));
-		ctx.setNat(new AtomicReference<>());
-		ctx.setSendMHRef(new AtomicReference<MessageHeader>());
-		ctx.setConnectionState(new AtomicReference<State>(new State()));
-		ctx.setListeners(Arrays.asList(
-				new StunMessageListener(ctx), 
-				new P2PMessageListener(ctx)
-			));
-		ctx.setObjectMapper(new ObjectMapper());
+public class UdpClient extends AbstractUdpBase {
+	public UdpClient(ClientConfig config) throws Exception {
+		super(config);
+		ctx.getListeners().add(new P2PMessageListener(ctx));
 	}
 	
-	public static void main(String[] args) throws SocketException {
-		UdpClient client = new UdpClient();
+	public static void main(String[] args) throws Exception {
+		UdpClient client = new UdpClient(ConfigLoader.INSTANCE.getClientConfig());
 		client.start();
 	}
 	
 	public void start() {
-		Thread t5 = new Thread(new DatagramListenerThread(ctx));t5.start();
-		Thread t2 = new Thread(new StunMessageSender(ctx));t2.start();
-		Thread t3 = new Thread(new GetOtherNatThread(ctx));t3.start();
+		Thread datagramListener = new Thread(new DatagramListenerThread(ctx));datagramListener.start();
+		Thread stunSender = new Thread(new StunMessageSender(ctx));stunSender.start();
+		Thread otherNat = new Thread(new GetOtherNatThread(ctx));otherNat.start();
 		Thread stateChangeThread = new Thread(new StateChangeThread(ctx));stateChangeThread.start();
 		Thread consoleThread = new Thread(new ConsoleReaderThread(ctx));consoleThread.start();
 		
 		try {
 			consoleThread.join();
-			t2.join();
-			t3.join();
-			//t4.join();
-			t5.join();
+			stunSender.join();
+			otherNat.join();
+			datagramListener.join();
 			consoleThread.join();
 			stateChangeThread.join();
 		} catch (InterruptedException e) {
