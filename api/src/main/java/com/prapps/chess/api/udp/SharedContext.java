@@ -95,10 +95,8 @@ public class SharedContext {
 	}
 	
 	private void send(DatagramPacket packet) throws IOException {
-		LOG.trace("Sending Packet: "+new String(packet.getData()));
-		synchronized (socket) {
-			socket.send(packet);
-		}
+		socket.send(packet);
+		LOG.trace("Packet sent to "+packet.getPort()+" Data: "+new String(packet.getData()));
 	}
 	
 	public void send(Message msg) throws IOException {
