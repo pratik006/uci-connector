@@ -22,7 +22,7 @@ public class SharedContext {
 	private Logger LOG = LoggerFactory.getLogger(SharedContext.class);
 	public static int TIME_DIFF_ALLOWED = 5*60*1000;
 	
-	private static DatagramSocket socket;
+	private DatagramSocket socket;
 	private String id;
 	private String otherId;
 	private AtomicReference<MessageHeader> sendMHRef = new AtomicReference<MessageHeader>();
@@ -33,11 +33,11 @@ public class SharedContext {
 	private List<PacketListener> listeners;
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
-	/*public static DatagramSocket getSocket() {
+	public DatagramSocket getSocket() {
 		return socket;
-	}*/
+	}
 	public void setSocket(DatagramSocket socket) {
-		SharedContext.socket = socket;
+		this.socket = socket;
 	}
 	public String getId() {
 		return id;
@@ -97,6 +97,7 @@ public class SharedContext {
 	private void send(DatagramPacket packet) throws IOException {
 		socket.send(packet);
 		LOG.trace("Packet sent to "+packet.getPort()+" Data: "+new String(packet.getData()));
+		LOG.trace("From "+socket.getLocalAddress().getHostName()+":"+socket.getLocalPort());
 	}
 	
 	public void send(Message msg) throws IOException {

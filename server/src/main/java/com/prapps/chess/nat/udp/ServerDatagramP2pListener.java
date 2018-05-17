@@ -42,9 +42,9 @@ public class ServerDatagramP2pListener extends AbstractNetworkListener implement
 		Message msg;
 		try {
 			msg = mapper.readValue(new String(packet.getData()), Message.class);
-			LOG.debug("P2P server msg: "+msg);
+			LOG.trace("P2P server msg: "+msg);
 			if (System.currentTimeMillis() - msg.getTimestamp() > 30000) {
-				LOG.debug("Old packet, discarding");
+				LOG.trace("Old packet, discarding");
 				return;
 			}
 			
@@ -63,13 +63,14 @@ public class ServerDatagramP2pListener extends AbstractNetworkListener implement
 				}	
 			} else if (msg.getType() == Message.HANDSHAKE_TYPE) {
 				seq.set(0);
-				if (ctx.getConnectionState().get().getState() == State.MAC_UPDATED 
-						&& ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_ONE_WAY)) {
-					synchronized (ctx.getConnectionState()) {
-						ctx.getConnectionState().get().setState(State.HANDSHAKE_ONE_WAY);
-						ctx.getConnectionState().notifyAll();
+				if (ctx.getConnectionState().get().getState() >= State.MAC_UPDATED) {
+					if (ctx.getConnectionState().get().isHigherState(State.HANDSHAKE_ONE_WAY)) {
+						synchronized (ctx.getConnectionState()) {
+							ctx.getConnectionState().get().setState(State.HANDSHAKE_ONE_WAY);
+							ctx.getConnectionState().notifyAll();
+						}
 					}
-					ctx.send(Message.HANDSHAKE_COMNPLETE_TYPE);
+					ctx.send(Message.HANDSHAKE_TYPE);
 				}
 			} else if (msg.getType() == Message.HANDSHAKE_COMNPLETE_TYPE) {
 				if (ctx.getConnectionState().get().getState() == State.HANDSHAKE_ONE_WAY 

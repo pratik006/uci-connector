@@ -41,7 +41,7 @@ public class StunMessageListener implements PacketListener {
 				if ((ma == null) || (ca == null)) {
 					System.out.println("Response does not contain a Mapped Address or Changed Address message attribute.");
 				} else {
-					LOG.debug("Mapped address "+ma.getAddress().getInetAddress().getHostName()+" : "+ma.getPort());
+					LOG.debug(ctx.getId()+" Mapped address "+ma.getAddress().getInetAddress().getHostName()+" : "+ma.getPort());
 					if (ma != null) {
 						RestUtil.updateNatDetails(ctx.getBaseConfig().getExternalHost(), ctx.getId(), 
 								ma.getAddress().getInetAddress().getHostName(), ma.getPort());
@@ -55,9 +55,7 @@ public class StunMessageListener implements PacketListener {
 						try { Thread.sleep(SharedContext.TIME_DIFF_ALLOWED); } catch (InterruptedException e) { e.printStackTrace(); }
 					}
 				}
-			} catch (MessageHeaderParsingException e) {
-				//System.out.println("Cannot parse: "+new String(packet.getData()));
-			}
+			} catch (MessageHeaderParsingException e) { }
 			catch (MessageAttributeParsingException | UtilityException | IOException e1) {
 				e1.printStackTrace();
 			}

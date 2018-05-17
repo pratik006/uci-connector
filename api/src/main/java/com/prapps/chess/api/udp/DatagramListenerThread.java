@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DatagramListenerThread implements Runnable {
-	private Logger LOG = LoggerFactory.getLogger(StateChangeThread.class);
+	private Logger LOG = LoggerFactory.getLogger(DatagramListenerThread.class);
 	private SharedContext ctx;
 	
 	public DatagramListenerThread(SharedContext ctx) {
