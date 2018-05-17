@@ -1,6 +1,6 @@
 {
-"serverId": "Desky",
-"clientId": "lappy",
+"id": "lappy",
+"otherId": "Desky",
 "protocol": "udp",
 "udpConfig": {
 	"stunServers": [{"host": "jstun.javawi.de","port": 3478}, {"host": "stun4.l.google.com","port": 19302}],

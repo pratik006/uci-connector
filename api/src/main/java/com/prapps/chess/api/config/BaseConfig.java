@@ -5,25 +5,25 @@ import java.util.List;
 import com.prapps.chess.api.StunServer;
 
 public class BaseConfig {
-	private String serverId;
-	private String clientId;
+	private String id;
+	private String otherId;
 	private UdpConfig udpConfig;
 	private TcpConfig tcpConfig;
 	private int tcpPort;
 	private String protocol;
 	private String externalHost;
 	
-	public String getServerId() {
-		return serverId;
+	public String getId() {
+		return id;
 	}
-	public void setServerId(String serverId) {
-		this.serverId = serverId;
+	public void setId(String id) {
+		this.id = id;
 	}
-	public String getClientId() {
-		return clientId;
+	public String getOtherId() {
+		return otherId;
 	}
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
+	public void setOtherId(String otherId) {
+		this.otherId = otherId;
 	}
 	public UdpConfig getUdpConfig() {
 		return udpConfig;
