@@ -20,11 +20,10 @@ public class DatagramListenerThread implements Runnable {
 			byte[] buf = new byte[2000];
 			DatagramPacket p = new DatagramPacket(buf, buf.length);
 			try {
-				LOG.trace("waiting for packet...");
 				ctx.receive(p);
 				LOG.trace(new String("Received Packet from "+p.getAddress()+":"+p.getPort()+"\tDate: "+new String(p.getData())));
-				ctx.getListeners().forEach(listener -> listener.onReceive(p));
-			} catch(java.net.SocketTimeoutException e) { }
+				new Thread(() -> ctx.getListeners().forEach(listener -> listener.onReceive(p))).start();
+			} catch(java.net.SocketTimeoutException e) { e.printStackTrace(); }
 			catch (IOException e) {
 				e.printStackTrace();
 			}
