@@ -10,6 +10,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prapps.chess.api.Message;
+import com.prapps.chess.api.config.ClientConfig;
+import com.prapps.chess.api.config.ConfigLoader;
 import com.prapps.chess.api.udp.AbstractP2PListener;
 import com.prapps.chess.api.udp.ConsoleReaderThread;
 import com.prapps.chess.api.udp.DatagramListenerThread;
@@ -19,8 +21,6 @@ import com.prapps.chess.api.udp.State;
 import com.prapps.chess.api.udp.StateChangeThread;
 import com.prapps.chess.api.udp.StunMessageListener;
 import com.prapps.chess.api.udp.StunMessageSender;
-import com.prapps.chess.client.config.ClientConfig;
-import com.prapps.chess.client.config.ConfigLoader;
 
 import de.javawi.jstun.header.MessageHeader;
 
@@ -28,10 +28,10 @@ public class UdpClient {
 	private SharedContext ctx;
 	
 	public UdpClient() throws SocketException {
-		ClientConfig config = ConfigLoader.INSTANCE.getClientConfig();
+		ClientConfig config = (ClientConfig) ConfigLoader.CLIENT_INSTANCE.getConfig();
 		DatagramSocket socket = new DatagramSocket(config.getUdpConfig().getSourcePort());
-		socket.setReuseAddress(true);
-		socket.setSoTimeout(config.getUdpConfig().getSocketTimeout());
+		//socket.setReuseAddress(true);
+		//socket.setSoTimeout(config.getUdpConfig().getSocketTimeout());
 		ctx = new SharedContext();
 		ctx.setSocket(socket);
 		ctx.setId(config.getClientId());
@@ -54,16 +54,10 @@ public class UdpClient {
 	}
 	
 	public void start() {
-		DatagramListenerThread datagramListenerThread = new DatagramListenerThread(ctx);
-		GetOtherNatThread otherNatThread = new GetOtherNatThread(ctx);
-		StunMessageSender stunMessageSender = new StunMessageSender(ctx);
-		StateChangeThread stateChange = new StateChangeThread(ctx);
-
-		Thread t5 = new Thread(datagramListenerThread);t5.start();
-		Thread t2 = new Thread(stunMessageSender);t2.start();
-		Thread t3 = new Thread(otherNatThread);t3.start();
-		//Thread t4 = new Thread(handshakeThread);t4.start();
-		Thread stateChangeThread = new Thread(stateChange);stateChangeThread.start();
+		Thread t5 = new Thread(new DatagramListenerThread(ctx));t5.start();
+		Thread t2 = new Thread(new StunMessageSender(ctx));t2.start();
+		Thread t3 = new Thread(new GetOtherNatThread(ctx));t3.start();
+		Thread stateChangeThread = new Thread(new StateChangeThread(ctx));stateChangeThread.start();
 		Thread consoleThread = new Thread(new ConsoleReaderThread(ctx));consoleThread.start();
 		
 		try {
