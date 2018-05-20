@@ -36,6 +36,7 @@ public class SharedContext {
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private String uuid;
 	private AtomicLong seq = new AtomicLong(0);
+	private AtomicLong readSeq = new AtomicLong(0);
 	
 	public DatagramSocket getSocket() {
 		return socket;
@@ -79,6 +80,7 @@ public class SharedContext {
 	public void setNat(AtomicReference<NatDetail> nat) {
 		this.nat = nat;
 	}
+	public int getState() { return connectionState.get() != null ? connectionState.get().getState() : -1; }
 	public AtomicReference<State> getConnectionState() {
 		return connectionState;
 	}
@@ -101,20 +103,24 @@ public class SharedContext {
 	private void send(DatagramPacket packet) throws IOException {
 		socket.send(packet);
 		LOG.trace("Packet sent to "+packet.getPort()+" Data: "+new String(packet.getData()));
-		LOG.trace("From "+socket.getLocalAddress().getHostName()+":"+socket.getLocalPort());
+		//LOG.trace("From "+socket.getLocalAddress().getHostName()+":"+socket.getLocalPort());
 	}
 	
 	public void send(Message msg) throws IOException {
 		msg.setTimestamp(System.currentTimeMillis());
-		if (nat != null && nat.get().getHost() != null && nat.get().getPort() != 0) {
+		if (nat.get() != null && nat.get().getHost() != null && nat.get().getPort() != 0) {
 			msg.setPort(nat.get().getPort());
 			msg.setHost(nat.get().getHost());
 		}
 		
+		int port = msg.getPort();
+		String host = msg.getHost();
+		msg.setHost(null);
+		msg.setPort(-1);
 		String json = getObjectMapper().writeValueAsString(msg);
 		DatagramPacket p = new DatagramPacket(json.getBytes(), json.getBytes().length);
-		p.setPort(msg.getPort());
-		p.setAddress(InetAddress.getByName(msg.getHost()));
+		p.setPort(port);
+		p.setAddress(InetAddress.getByName(host));
 		send(p);
 	}
 	
@@ -139,7 +145,7 @@ public class SharedContext {
 		socket.close();
 	}
 	
-	public String generateUuid() {
+	private String generateUuid() {
 		this.uuid = UUID.randomUUID().toString();
 		LOG.debug("UUID: "+this.uuid);
 		return uuid;
@@ -151,6 +157,7 @@ public class SharedContext {
 		}
 		
 		String otherUuid = new String(msg.getData());
+		//LOG.debug(this.uuid+" vs "+otherUuid);
 		return uuid != null && this.uuid.equals(otherUuid);
 	}
 	
@@ -162,6 +169,7 @@ public class SharedContext {
 		synchronized (seq) {
 			this.seq.set(0);	
 		}
+		readSeq.set(0);
 	}
 	
 	public Long getSeq() {
@@ -169,6 +177,14 @@ public class SharedContext {
 	}
 	
 	public Long incrementSeq() {
+		return this.seq.incrementAndGet();
+	}
+	
+	public Long getReadSeq() {
+		return seq.get();
+	}
+	
+	public Long incrementReadSeq() {
 		return this.seq.incrementAndGet();
 	}
 }

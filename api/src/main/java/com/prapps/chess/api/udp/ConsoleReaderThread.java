@@ -20,9 +20,8 @@ public class ConsoleReaderThread implements Runnable {
 	@Override
 	public void run() {
 		String line = null;
-		int seq = 1;
 		try {
-			while (ctx.getConnectionState().get().getState() != State.HANDSHAKE_TWO_WAY) {
+			while (ctx.getState() != State.HANDSHAKE_TWO_WAY) {
 				synchronized (ctx.getConnectionState()) {
 					ctx.getConnectionState().wait();
 				}
@@ -31,10 +30,12 @@ public class ConsoleReaderThread implements Runnable {
 			LOG.debug("ConsoleReaderThread: listenening...");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 			while (!ctx.getExit().get()) {
-				while (!ctx.getExit().get() && (line = reader.readLine()) != null) {
+				while (!ctx.getExit().get() && (line = reader.readLine()) != null && !line.equals("\n")) {
 					LOG.trace("line: "+line);
 					try {
-						ctx.send(new Message(seq++, "critter", line + "\n"));
+						Message msg = new Message(ctx.incrementSeq(), "critter", line + "\n");
+						msg.setType(Message.ENGINE_TYPE);
+						ctx.send(msg);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

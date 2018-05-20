@@ -17,11 +17,11 @@ public class DatagramListenerThread implements Runnable {
 	@Override
 	public void run() {
 		while (!ctx.getExit().get()) {
-			byte[] buf = new byte[2000];
+			byte[] buf = new byte[65000];
 			DatagramPacket p = new DatagramPacket(buf, buf.length);
 			try {
 				ctx.receive(p);
-				LOG.trace(new String("Received Packet from "+p.getAddress()+":"+p.getPort()+"\tDate: "+new String(p.getData())));
+				LOG.trace(new String("Received Packet from "+p.getAddress()+":"+p.getPort()+"\tData: "+new String(p.getData())));
 				new Thread(() -> ctx.getListeners().forEach(listener -> listener.onReceive(p))).start();
 			} catch(java.net.SocketTimeoutException e) { e.printStackTrace(); }
 			catch (IOException e) {

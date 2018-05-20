@@ -1,17 +1,17 @@
 package com.prapps.chess.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Message implements Comparable<Message> {
-	public static final int ENGINE_TYPE = 1;
-	public static final int HANDSHAKE_TYPE = 2;
-	public static final int HANDSHAKE_COMNPLETE_TYPE = 3;
-	public static final int AVAILABLE_ENGINE_TYPE = 4;
+	public static final int ENGINE_TYPE = 100;
 	
 	private String engineId;
 	private long seq;
 	private byte[] data;
 	private int type;
-	private String host;
-	private int port;
+	@JsonIgnore private String host;
+	@JsonIgnore private int port;
+	private boolean ack;
 	private long timestamp;
 	
 	public Message() { }
@@ -84,6 +84,14 @@ public class Message implements Comparable<Message> {
 
 	public void setPort(int port) {
 		this.port = port;
+	}
+
+	public boolean isAck() {
+		return ack;
+	}
+
+	public void setAck(boolean ack) {
+		this.ack = ack;
 	}
 
 	public long getTimestamp() {

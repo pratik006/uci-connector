@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.prapps.chess.api.Message;
-
 public class StateChangeThread implements Runnable {
 	private Logger LOG = LoggerFactory.getLogger(StateChangeThread.class);
 	private SharedContext ctx;
@@ -38,31 +36,34 @@ public class StateChangeThread implements Runnable {
 			break;
 			case State.RECEIVED_OTHER_MAC:
 				LOG.debug("Recvd Other Nat "+ctx.getNat());
-				while (ctx.getConnectionState().get().getState() == State.RECEIVED_OTHER_MAC) {
-					try {
-						ctx.send(Message.HANDSHAKE_TYPE);
-						Thread.sleep(1000);	
-					} catch (InterruptedException | IOException e) {
-						e.printStackTrace();
-					}	
-				}
+				sendMsg(State.RESET_CONNECTION);
+			break;
+			case State.RESET_CONNECTION:
+				ctx.resetSeq();
+				ctx.resetUuid();
+				LOG.debug("Connection Reset");
+				sendMsg(State.HANDSHAKE_ONE_WAY);
 			break;
 			case State.HANDSHAKE_ONE_WAY:
 				LOG.debug("one way handshake");
-				while (ctx.getConnectionState().get().getState() == State.HANDSHAKE_ONE_WAY) {
-					try {
-						ctx.send(Message.HANDSHAKE_COMNPLETE_TYPE);
-						Thread.sleep(1000);
-					} catch (IOException | InterruptedException e) {
-						e.printStackTrace();
-					}
-				}				
+				sendMsg(State.HANDSHAKE_TWO_WAY);
 			break;
 			case State.HANDSHAKE_TWO_WAY:
-				LOG.debug("Handshake complete");
+				LOG.info("Handshake complete");
 			break;
 			}
 			
+		}
+	}
+	
+	public void sendMsg(int state) {
+		while (ctx.getConnectionState().get().getState() == state-1) {
+			try {
+				ctx.send(state);
+				Thread.sleep(500);
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+			}	
 		}
 	}
 }

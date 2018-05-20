@@ -3,7 +3,6 @@ package com.prapps.chess.api.udp;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.PriorityQueue;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ public class DatagramUciListener implements PacketListener {
 	private Logger LOG = LoggerFactory.getLogger(DatagramUciListener.class);
 	private SharedContext ctx;
 	private PriorityQueue<Message> queue = new PriorityQueue<>();
-	private AtomicLong seq = new AtomicLong(0);
 	
 	public DatagramUciListener(SharedContext ctx) {
 		this.ctx = ctx;
@@ -27,30 +25,29 @@ public class DatagramUciListener implements PacketListener {
 			try {
 				msg = ctx.getObjectMapper().readValue(new String(packet.getData()), Message.class);
 				LOG.trace("UCI server msg: "+msg);
-				if (System.currentTimeMillis() - msg.getTimestamp() > 30000) {
+				if (msg.getType() != Message.ENGINE_TYPE || System.currentTimeMillis() - msg.getTimestamp() > 30000) {
 					LOG.trace("Old packet, discarding");
 					return;
 				}
 				
-				if (msg.getType() == Message.ENGINE_TYPE) {
-					if (seq.get()+1 == msg.getSeq()) {
-						System.out.print(new String(msg.getData()));
-						synchronized (seq) {
-							seq.incrementAndGet();	
+				StringBuilder sb = new StringBuilder();
+				if (ctx.getReadSeq()+1 == msg.getSeq()) {
+					sb.append(new String(msg.getData()));
+					synchronized (ctx.getReadSeq()) {
+						ctx.incrementSeq();	
+					}
+					
+					for (Message m : queue) {
+						if (ctx.getReadSeq()+1 == m.getSeq()) {
+							sb.append(new String(msg.getData()));
+							ctx.incrementSeq();
 						}
-						for (Message m : queue) {
-							if (seq.get()+1 == m.getSeq()) {
-								System.out.print(new String(msg.getData()));
-								seq.incrementAndGet();
-							}
-						}
-					} else {
-						queue.add(msg);
-					}	
-				} 
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
+					}
+				} else {
+					queue.add(msg);
+				}	
+				System.out.print(sb.toString());
+			} catch(IOException e) { e.printStackTrace(); }
 		}
 	}
 

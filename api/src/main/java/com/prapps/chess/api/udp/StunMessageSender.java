@@ -29,9 +29,9 @@ public class StunMessageSender implements Runnable {
 	public void run() {
 		int timeSinceFirstTransmission = 0;
 		int timeout = 10000;
-		while (!ctx.getExit().get() && ctx.getConnectionState().get().getState() != State.HANDSHAKE_TWO_WAY) {
+		while (!ctx.getExit().get()) {
+			int delay = ctx.getState() != State.HANDSHAKE_TWO_WAY ? 5000 : 60000;
 			try {
-				// Test 1 including response
 				MessageHeader sendMH = new MessageHeader(MessageHeader.MessageHeaderType.BindingRequest);
 				sendMH.generateTransactionID();
 				ctx.getSendMHRef().set(sendMH);
@@ -43,7 +43,7 @@ public class StunMessageSender implements Runnable {
 				InetAddress stunAddress = InetAddress.getByName(stunServer.getHost());
 				DatagramPacket send = new DatagramPacket(data, data.length, stunAddress, stunServer.getPort());
 				ctx.connectAndSend(send);
-				Thread.sleep(5000);
+				Thread.sleep(delay);
 			} catch (UtilityException | IOException | InterruptedException ste) {
 				if (timeSinceFirstTransmission < 7900) {
 					LOG.error("Test 1: Socket timeout while receiving the response.");

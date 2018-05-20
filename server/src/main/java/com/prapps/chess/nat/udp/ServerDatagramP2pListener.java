@@ -34,6 +34,7 @@ public class ServerDatagramP2pListener extends AbstractNetworkListener implement
 	@Override
 	protected void send(Message msg) {
 		try {
+			LOG.debug("length: "+msg.getData().length);
 			ctx.send(msg);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -52,25 +53,23 @@ public class ServerDatagramP2pListener extends AbstractNetworkListener implement
 					return;
 				}
 				
-				if (msg.getType() == Message.ENGINE_TYPE) {
-					if (seq.get()+1 == msg.getSeq()) {
-						handleMessage(msg);
-						synchronized (seq) {
-							seq.incrementAndGet();	
+				LOG.trace("Expecting seq "+(ctx.getReadSeq()+1)+" but has "+msg.getSeq());
+				if (ctx.getReadSeq()+1 == msg.getSeq()) {
+					handleMessage(msg);
+					synchronized (ctx.getReadSeq()) {
+						ctx.incrementSeq();	
+					}
+					
+					for (Message m : queue) {
+						if (ctx.getReadSeq()+1 == m.getSeq()) {
+							handleMessage(msg);
+							ctx.incrementSeq();
 						}
-						for (Message m : queue) {
-							if (seq.get()+1 == m.getSeq()) {
-								handleMessage(m);
-								seq.incrementAndGet();
-							}
-						}
-					} else {
-						queue.add(msg);
-					}	
-				} 
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+					}
+				} else {
+					queue.add(msg);
+				}	
+			} catch (IOException e) { }
 		}
 	}
 	
