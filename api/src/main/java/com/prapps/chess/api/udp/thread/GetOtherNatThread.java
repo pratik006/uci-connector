@@ -1,13 +1,20 @@
-package com.prapps.chess.api.udp;
+package com.prapps.chess.api.udp.thread;
 
 import static com.prapps.chess.api.udp.SharedContext.TIME_DIFF_ALLOWED;
-import static com.prapps.chess.api.udp.State.*;
+import static com.prapps.chess.api.udp.State.RECEIVED_OTHER_MAC;
+
 import java.util.Calendar;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.prapps.chess.api.NatDetail;
 import com.prapps.chess.api.RestUtil;
+import com.prapps.chess.api.udp.SharedContext;
+import com.prapps.chess.api.udp.State;
 
 public class GetOtherNatThread implements Runnable {
+	private Logger LOG = LoggerFactory.getLogger(GetOtherNatThread.class);
 	private SharedContext ctx;
 	
 	public GetOtherNatThread(SharedContext ctx) {
@@ -43,9 +50,12 @@ public class GetOtherNatThread implements Runnable {
 					System.out.println("Other computer is not online");
 					Thread.sleep(5000);	
 				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			} catch (InterruptedException e) { 
+				if (!ctx.getExit().get()) { 
+					LOG.error(e.getMessage());
+				}
 			}
 		}
+		LOG.info("exitting GetOtherNatThread");
 	}
 }

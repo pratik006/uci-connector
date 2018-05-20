@@ -1,4 +1,4 @@
-package com.prapps.chess.api.udp;
+package com.prapps.chess.api.udp.thread;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.prapps.chess.api.Message;
+import com.prapps.chess.api.udp.SharedContext;
+import com.prapps.chess.api.udp.State;
 
 public class ConsoleReaderThread implements Runnable {
 	private Logger LOG = LoggerFactory.getLogger(ConsoleReaderThread.class);
@@ -30,7 +32,7 @@ public class ConsoleReaderThread implements Runnable {
 			LOG.debug("ConsoleReaderThread: listenening...");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 			while (!ctx.getExit().get()) {
-				while (!ctx.getExit().get() && (line = reader.readLine()) != null && !line.equals("\n")) {
+				while (ctx.getState() != State.DISCONNECTED && (line = reader.readLine()) != null && !line.equals("\n")) {
 					LOG.trace("line: "+line);
 					try {
 						Message msg = new Message(ctx.incrementSeq(), "critter", line + "\n");
@@ -39,8 +41,13 @@ public class ConsoleReaderThread implements Runnable {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					if ("quit".equalsIgnoreCase(line))
-						ctx.getExit().set(true);
+					if (line.contains("quit")) {
+						synchronized (ctx.getConnectionState()) {
+							ctx.getConnectionState().get().setState(State.DISCONNECTED);
+							ctx.getConnectionState().notifyAll();
+						}
+						break;
+					}
 				}
 			}
 		} catch (IOException | InterruptedException e) {

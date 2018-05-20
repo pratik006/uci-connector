@@ -1,10 +1,12 @@
-package com.prapps.chess.api.udp;
+package com.prapps.chess.api.udp.thread;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.prapps.chess.api.udp.SharedContext;
 
 public class DatagramListenerThread implements Runnable {
 	private Logger LOG = LoggerFactory.getLogger(DatagramListenerThread.class);
@@ -25,8 +27,10 @@ public class DatagramListenerThread implements Runnable {
 				new Thread(() -> ctx.getListeners().forEach(listener -> listener.onReceive(p))).start();
 			} catch(java.net.SocketTimeoutException e) { e.printStackTrace(); }
 			catch (IOException e) {
-				e.printStackTrace();
+				if (!ctx.getExit().get())
+					e.printStackTrace();
 			}
 		}
+		LOG.info("exitting DatagramListenerThread");
 	}
 }

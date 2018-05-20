@@ -1,4 +1,4 @@
-package com.prapps.chess.api.udp;
+package com.prapps.chess.api.udp.thread;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.prapps.chess.api.StunServer;
+import com.prapps.chess.api.udp.SharedContext;
+import com.prapps.chess.api.udp.State;
 
 import de.javawi.jstun.attribute.ChangeRequest;
 import de.javawi.jstun.header.MessageHeader;
@@ -58,8 +60,12 @@ public class StunMessageSender implements Runnable {
 					
 				}
 			}
-			try { Thread.sleep(60000); } catch (InterruptedException e) { e.printStackTrace(); }
+			try { Thread.sleep(60000); } catch (InterruptedException e) {
+				if (!ctx.getExit().get())
+					LOG.error("interrupted"); 
+			}
 		}
+		LOG.info("exitting StunMessageSender");
 	}
 
 }

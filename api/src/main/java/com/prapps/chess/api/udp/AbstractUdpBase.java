@@ -5,12 +5,16 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prapps.chess.api.config.BaseConfig;
 
 import de.javawi.jstun.header.MessageHeader;
 
 public abstract class AbstractUdpBase extends AbstractNetworkBase {
+	protected Logger LOG = LoggerFactory.getLogger(AbstractUdpBase.class);
 	protected SharedContext ctx;
 	
 	public AbstractUdpBase(BaseConfig config) throws Exception {

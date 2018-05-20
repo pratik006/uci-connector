@@ -1,12 +1,12 @@
 package com.prapps.chess.client;
 
 import com.prapps.chess.api.udp.AbstractUdpBase;
-import com.prapps.chess.api.udp.ConsoleReaderThread;
-import com.prapps.chess.api.udp.DatagramListenerThread;
 import com.prapps.chess.api.udp.DatagramUciListener;
-import com.prapps.chess.api.udp.GetOtherNatThread;
-import com.prapps.chess.api.udp.StateChangeThread;
-import com.prapps.chess.api.udp.StunMessageSender;
+import com.prapps.chess.api.udp.thread.ConsoleReaderThread;
+import com.prapps.chess.api.udp.thread.DatagramListenerThread;
+import com.prapps.chess.api.udp.thread.GetOtherNatThread;
+import com.prapps.chess.api.udp.thread.StateChangeThread;
+import com.prapps.chess.api.udp.thread.StunMessageSender;
 import com.prapps.chess.client.config.ClientConfig;
 import com.prapps.chess.client.config.ConfigLoader;
 
@@ -29,16 +29,21 @@ public class UdpClient extends AbstractUdpBase {
 		Thread consoleThread = new Thread(new ConsoleReaderThread(ctx));consoleThread.start();
 		
 		try {
-			consoleThread.join();
-			stunSender.join();
-			otherNat.join();
-			datagramListener.join();
-			consoleThread.join();
 			stateChangeThread.join();
+			consoleThread.interrupt();
+			consoleThread.join();
+			stunSender.interrupt();
+			stunSender.join();
+			otherNat.interrupt();
+			otherNat.join();
+			datagramListener.interrupt();
+			datagramListener.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} finally {
 			ctx.close();
 		}
+		LOG.debug("Exitting main thread");
+		System.exit(0);
 	}
 }

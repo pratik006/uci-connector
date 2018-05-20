@@ -1,9 +1,12 @@
-package com.prapps.chess.api.udp;
+package com.prapps.chess.api.udp.thread;
 
 import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.prapps.chess.api.udp.SharedContext;
+import com.prapps.chess.api.udp.State;
 
 public class StateChangeThread implements Runnable {
 	private Logger LOG = LoggerFactory.getLogger(StateChangeThread.class);
@@ -18,7 +21,7 @@ public class StateChangeThread implements Runnable {
 		int prevState = State.DISCONNECTED;
 		
 		while (!ctx.getExit().get()) {
-			while (ctx.getConnectionState().get().getState() == prevState) {
+			while (!ctx.getExit().get() && ctx.getConnectionState().get().getState() == prevState) {
 				synchronized (ctx.getConnectionState()) {
 					try {
 						ctx.getConnectionState().wait();
@@ -51,9 +54,17 @@ public class StateChangeThread implements Runnable {
 			case State.HANDSHAKE_TWO_WAY:
 				LOG.info("Handshake complete");
 			break;
-			}
-			
+			case State.DISCONNECTED:
+				LOG.info("Exit initiated...");
+				synchronized (ctx.getExit()) {
+					ctx.getExit().set(Boolean.TRUE);
+					ctx.getExit().notifyAll();
+				}
+				ctx.close();
+			break;
+			}			
 		}
+		LOG.info("exitting...");
 	}
 	
 	public void sendMsg(int state) {

@@ -3,10 +3,10 @@ package com.prapps.chess.nat.udp;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.prapps.chess.api.udp.AbstractUdpBase;
-import com.prapps.chess.api.udp.DatagramListenerThread;
-import com.prapps.chess.api.udp.GetOtherNatThread;
-import com.prapps.chess.api.udp.StateChangeThread;
-import com.prapps.chess.api.udp.StunMessageSender;
+import com.prapps.chess.api.udp.thread.DatagramListenerThread;
+import com.prapps.chess.api.udp.thread.GetOtherNatThread;
+import com.prapps.chess.api.udp.thread.StateChangeThread;
+import com.prapps.chess.api.udp.thread.StunMessageSender;
 import com.prapps.chess.server.config.ServerConfig;
 
 public class UdpListener extends AbstractUdpBase implements Runnable {
