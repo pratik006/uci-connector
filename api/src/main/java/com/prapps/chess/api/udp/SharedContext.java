@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -37,6 +38,7 @@ public class SharedContext {
 	private String uuid;
 	private AtomicLong seq = new AtomicLong(0);
 	private AtomicLong readSeq = new AtomicLong(0);
+	private PriorityQueue<Message> queue = new PriorityQueue<>();
 	
 	public DatagramSocket getSocket() {
 		return socket;
@@ -108,13 +110,14 @@ public class SharedContext {
 	
 	public void send(Message msg) throws IOException {
 		msg.setTimestamp(System.currentTimeMillis());
-		if (nat.get() != null && nat.get().getHost() != null && nat.get().getPort() != 0) {
-			msg.setPort(nat.get().getPort());
-			msg.setHost(nat.get().getHost());
-		}
-		
 		int port = msg.getPort();
 		String host = msg.getHost();
+		
+		if (nat.get() != null && nat.get().getHost() != null && nat.get().getPort() > 0) {
+			port = nat.get().getPort();
+			host = nat.get().getHost();
+		}
+		
 		msg.setHost(null);
 		msg.setPort(-1);
 		String json = getObjectMapper().writeValueAsString(msg);
@@ -170,6 +173,7 @@ public class SharedContext {
 			this.seq.set(0);	
 		}
 		readSeq.set(0);
+		queue.clear();
 	}
 	
 	public Long getSeq() {
@@ -186,5 +190,17 @@ public class SharedContext {
 	
 	public Long incrementReadSeq() {
 		return this.seq.incrementAndGet();
+	}
+	
+	public void addToQueue(Message msg) {
+		queue.add(msg);
+	}
+	
+	public Message poll() {
+		return queue.poll();
+	}
+	
+	public boolean hasNext() {
+		return !queue.isEmpty();
 	}
 }

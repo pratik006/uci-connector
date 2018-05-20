@@ -12,7 +12,6 @@ import com.prapps.chess.api.Message;
 public class DatagramUciListener implements PacketListener {
 	private Logger LOG = LoggerFactory.getLogger(DatagramUciListener.class);
 	private SharedContext ctx;
-	private PriorityQueue<Message> queue = new PriorityQueue<>();
 	
 	public DatagramUciListener(SharedContext ctx) {
 		this.ctx = ctx;
@@ -37,16 +36,17 @@ public class DatagramUciListener implements PacketListener {
 						ctx.incrementSeq();	
 					}
 					
-					for (Message m : queue) {
-						if (ctx.getReadSeq()+1 == m.getSeq()) {
+					while ((msg = ctx.poll()) != null) {
+						if (ctx.getReadSeq()+1 == msg.getSeq()) {
 							sb.append(new String(msg.getData()));
 							ctx.incrementSeq();
 						}
 					}
+					System.out.print(sb.toString());
+					System.out.flush();
 				} else {
-					queue.add(msg);
+					ctx.addToQueue(msg);
 				}	
-				System.out.print(sb.toString());
 			} catch(IOException e) { e.printStackTrace(); }
 		}
 	}
