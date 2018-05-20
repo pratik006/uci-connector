@@ -10,16 +10,18 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.prapps.chess.api.Message;
 import com.prapps.chess.api.udp.SharedContext;
 import com.prapps.chess.server.EngineController;
 import com.prapps.chess.server.config.ServerConfig;
 
 public abstract class AbstractNetworkListener implements Runnable {
+	private Logger LOG = LoggerFactory.getLogger(AbstractNetworkListener.class);
 	protected LinkedList<Message> output = new LinkedList<>();
 	protected ServerConfig serverConfig;
-	protected ObjectMapper mapper = new ObjectMapper();
 	protected EngineController engineController;
 	protected Set<String> engineIds = new HashSet<>();
 	
@@ -48,7 +50,12 @@ public abstract class AbstractNetworkListener implements Runnable {
 							}
 						}
 					}
-					send(output.poll());
+					while (!output.isEmpty()) {
+						Message msg = output.poll();
+						msg.setSeq(ctx.incrementSeq());
+						LOG.debug("engine To Client: "+new String(msg.getData()));
+						send(msg);
+					}
 				}
 			}
 		}).start();

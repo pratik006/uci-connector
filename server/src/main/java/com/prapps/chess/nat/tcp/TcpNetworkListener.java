@@ -24,7 +24,7 @@ public class TcpNetworkListener extends AbstractNetworkListener {
 		if (clientSocket != null && clientSocket.isConnected()) {
 			try {
 				//System.out.println(new String(msg.getData()));
-				clientSocket.getOutputStream().write((mapper.writeValueAsString(msg)+"\n").getBytes());
+				clientSocket.getOutputStream().write((ctx.getObjectMapper().writeValueAsString(msg)+"\n").getBytes());
 				clientSocket.getOutputStream().flush();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -40,7 +40,7 @@ public class TcpNetworkListener extends AbstractNetworkListener {
 			String line = null;
 			BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
 			while ((line = reader.readLine()) != null) {
-				Message msg = mapper.readValue(line, Message.class);
+				Message msg = ctx.getObjectMapper().readValue(line, Message.class);
 				if (engineIds.contains(msg.getEngineId()))
 					engineController.addMessage(msg);
 			}

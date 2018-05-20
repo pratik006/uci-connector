@@ -1,15 +1,10 @@
 package com.prapps.chess.client;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-
-import com.prapps.chess.api.Message;
-import com.prapps.chess.api.udp.AbstractP2PListener;
 import com.prapps.chess.api.udp.AbstractUdpBase;
 import com.prapps.chess.api.udp.ConsoleReaderThread;
 import com.prapps.chess.api.udp.DatagramListenerThread;
+import com.prapps.chess.api.udp.DatagramUciListener;
 import com.prapps.chess.api.udp.GetOtherNatThread;
-import com.prapps.chess.api.udp.SharedContext;
 import com.prapps.chess.api.udp.StateChangeThread;
 import com.prapps.chess.api.udp.StunMessageSender;
 import com.prapps.chess.client.config.ClientConfig;
@@ -18,7 +13,7 @@ import com.prapps.chess.client.config.ConfigLoader;
 public class UdpClient extends AbstractUdpBase {
 	public UdpClient(ClientConfig config) throws Exception {
 		super(config);
-		ctx.getListeners().add(new P2PMessageListener(ctx));
+		ctx.getListeners().add(new DatagramUciListener(ctx));
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -46,38 +41,4 @@ public class UdpClient extends AbstractUdpBase {
 			ctx.close();
 		}
 	}
-	
-	public static class P2PMessageListener extends AbstractP2PListener {
-		public P2PMessageListener(SharedContext ctx) {
-			super(ctx);
-		}
-		
-		@Override
-		public void onReceive(DatagramPacket packet) {
-			Message msg;
-			try {
-				msg = ctx.getObjectMapper().readValue(new String(packet.getData()), Message.class);
-				if (msg.getType() == Message.ENGINE_TYPE) {
-					/*if (seq+1 == msg.getSeq()) {
-						handleMessage(msg);
-						seq++;
-						for (Message m : queue) {
-							if (seq+1 == m.getSeq()) {
-								handleMessage(m);
-								seq++;
-							}
-						}
-					} else {
-						queue.add(msg);
-					}*/	
-				} else {
-					super.onReceive(packet);
-				}
-			} catch(com.fasterxml.jackson.core.JsonParseException e) {} 
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 }

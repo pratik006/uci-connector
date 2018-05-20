@@ -41,7 +41,7 @@ public class StateChangeThread implements Runnable {
 				while (ctx.getConnectionState().get().getState() == State.RECEIVED_OTHER_MAC) {
 					try {
 						ctx.send(Message.HANDSHAKE_TYPE);
-						Thread.sleep(10000);	
+						Thread.sleep(1000);	
 					} catch (InterruptedException | IOException e) {
 						e.printStackTrace();
 					}	
@@ -52,7 +52,7 @@ public class StateChangeThread implements Runnable {
 				while (ctx.getConnectionState().get().getState() == State.HANDSHAKE_ONE_WAY) {
 					try {
 						ctx.send(Message.HANDSHAKE_COMNPLETE_TYPE);
-						Thread.sleep(2000);
+						Thread.sleep(1000);
 					} catch (IOException | InterruptedException e) {
 						e.printStackTrace();
 					}

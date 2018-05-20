@@ -30,5 +30,6 @@ public abstract class AbstractUdpBase extends AbstractNetworkBase {
 		ctx.setObjectMapper(new ObjectMapper());
 		ctx.setListeners(new ArrayList<>(2));
 		ctx.getListeners().add(new StunMessageListener(ctx));
+		ctx.getListeners().add(new DatagramHandshakeListener(ctx));
 	}
 }

@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 
 import com.prapps.chess.api.NatDetail;
 import com.prapps.chess.api.RestUtil;
@@ -13,6 +14,7 @@ import com.prapps.chess.api.udp.AbstractNetworkBase;
 public class ManualTestClient extends AbstractNetworkBase {
 	private String id;
 	private boolean exit;
+	private Socket clientSocket;
 	
 	public ManualTestClient(String id) {
 		this.id = id;
@@ -34,14 +36,30 @@ public class ManualTestClient extends AbstractNetworkBase {
 		Thread t2 = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				DatagramPacket p = null;
+				InetAddress a = null;
+				int port = 0;
+				int ackCount = 0;
 				while (!exit) {
 					byte[] buf = new byte[2000];
-					DatagramPacket p = new DatagramPacket(buf, buf.length);
+					p = new DatagramPacket(buf, buf.length);
 					try {
 						socket.receive(p);
+						a = p.getAddress();
+						port = p.getPort();
 						System.out.println("Recvd socket (port "+socket.getLocalPort()+") "+new String(p.getData()));
-					} catch (IOException e) { }
+						ackCount++;
+					} catch (IOException e) { e.printStackTrace();} 
 				}
+				socket.close();
+				try {
+					if (clientSocket == null) {
+						clientSocket = new Socket(a, port);
+						System.out.println("client socket created");
+						clientSocket.getOutputStream().write("hello from client".getBytes());
+						clientSocket.close();
+					}
+				}catch(Exception e) {e.printStackTrace();}
 			}
 		});t2.start();
 		new Thread(new Runnable() {
@@ -61,8 +79,6 @@ public class ManualTestClient extends AbstractNetworkBase {
 					exit = true;
 				} catch (Exception e) {
 					e.printStackTrace();
-				} finally {
-					socket.close();	
 				}
 			}
 		}).start();	

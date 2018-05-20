@@ -6,12 +6,16 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.prapps.chess.api.Message;
 import com.prapps.chess.server.config.ServerLoader;
 
 public enum EngineController {
 	INSTANCE;
 	
+	private Logger LOG = LoggerFactory.getLogger(EngineController.class);
 	private LinkedList<Message> input = new LinkedList<>();
 	private LinkedList<Message> output;
 	
@@ -32,7 +36,9 @@ public enum EngineController {
 			if (!engine.isStarted())
 				startEngine(msg.getEngineId());
 			
-			engine.write((new String(msg.getData())+"\n").getBytes());
+			String data = new String(msg.getData())+"\n";
+			LOG.trace("WRITING TO ENGINE: "+data);
+			engine.write(data.getBytes());
 		}
 	}
 	
@@ -50,8 +56,8 @@ public enum EngineController {
 							int readLen = -1;
 							while ((readLen = engine.getInputStream().read(buf)) != -1) {
 								byte[] data = new String(buf, 0, readLen).getBytes();
-								//System.out.println(new String(data));
-								output.add(new Message(1, engineId, data));
+								//LOG.trace("EngineController: "+new String(data));
+								output.add(new Message(-1, engineId, data));
 							}
 						}
 					} catch (IOException e) {

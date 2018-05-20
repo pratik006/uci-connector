@@ -5,7 +5,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -32,6 +34,8 @@ public class SharedContext {
 	private AtomicReference<State> connectionState = new AtomicReference<State>(new State());
 	private List<PacketListener> listeners;
 	private ObjectMapper objectMapper = new ObjectMapper();
+	private String uuid;
+	private AtomicLong seq = new AtomicLong(0);
 	
 	public DatagramSocket getSocket() {
 		return socket;
@@ -102,7 +106,7 @@ public class SharedContext {
 	
 	public void send(Message msg) throws IOException {
 		msg.setTimestamp(System.currentTimeMillis());
-		if (nat.get().getHost() != null && nat.get().getPort() != 0) {
+		if (nat != null && nat.get().getHost() != null && nat.get().getPort() != 0) {
 			msg.setPort(nat.get().getPort());
 			msg.setHost(nat.get().getHost());
 		}
@@ -115,7 +119,12 @@ public class SharedContext {
 	}
 	
 	public void send(int msgType) throws IOException {
-		send(new Message(msgType));
+		Message msg = new Message(msgType);
+		if (uuid == null) {
+			generateUuid();
+		}
+		msg.setData(uuid.getBytes());
+		send(msg);
 	}
 	
 	public void connectAndSend(DatagramPacket packet) throws IOException {
@@ -128,5 +137,38 @@ public class SharedContext {
 	
 	public void close() {
 		socket.close();
+	}
+	
+	public String generateUuid() {
+		this.uuid = UUID.randomUUID().toString();
+		LOG.debug("UUID: "+this.uuid);
+		return uuid;
+	}
+	
+	public boolean isSameUuid(Message msg) {
+		if (msg.getData() == null) {
+			return false;
+		}
+		
+		String otherUuid = new String(msg.getData());
+		return uuid != null && this.uuid.equals(otherUuid);
+	}
+	
+	public void resetUuid() {
+		uuid = null;
+	}
+	
+	public void resetSeq() {
+		synchronized (seq) {
+			this.seq.set(0);	
+		}
+	}
+	
+	public Long getSeq() {
+		return seq.get();
+	}
+	
+	public Long incrementSeq() {
+		return this.seq.incrementAndGet();
 	}
 }

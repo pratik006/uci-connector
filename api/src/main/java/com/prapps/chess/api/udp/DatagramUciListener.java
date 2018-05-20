@@ -1,4 +1,4 @@
-package com.prapps.chess.nat.udp;
+package com.prapps.chess.api.udp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -9,37 +9,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.prapps.chess.api.Message;
-import com.prapps.chess.api.udp.PacketListener;
-import com.prapps.chess.api.udp.SharedContext;
-import com.prapps.chess.api.udp.State;
-import com.prapps.chess.nat.AbstractNetworkListener;
-import com.prapps.chess.server.config.ServerConfig;
 
-public class ServerDatagramP2pListener extends AbstractNetworkListener implements PacketListener {
-	private Logger LOG = LoggerFactory.getLogger(ServerDatagramP2pListener.class);
-	private AtomicLong seq;
+public class DatagramUciListener implements PacketListener {
+	private Logger LOG = LoggerFactory.getLogger(DatagramUciListener.class);
+	private SharedContext ctx;
 	private PriorityQueue<Message> queue = new PriorityQueue<>();
+	private AtomicLong seq = new AtomicLong(0);
 	
+	public DatagramUciListener(SharedContext ctx) {
+		this.ctx = ctx;
+	}
 	
-	public ServerDatagramP2pListener(SharedContext ctx, ServerConfig serverConfig, AtomicLong seq) {
-		super(ctx, serverConfig);
-		this.seq = seq;
-	}
-
-	@Override
-	public void run() {
-		
-	}
-
-	@Override
-	protected void send(Message msg) {
-		try {
-			ctx.send(msg);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public void onReceive(DatagramPacket packet) {
 		if (ctx.getConnectionState().get().getState() == State.HANDSHAKE_TWO_WAY) {
@@ -54,13 +34,13 @@ public class ServerDatagramP2pListener extends AbstractNetworkListener implement
 				
 				if (msg.getType() == Message.ENGINE_TYPE) {
 					if (seq.get()+1 == msg.getSeq()) {
-						handleMessage(msg);
+						System.out.print(new String(msg.getData()));
 						synchronized (seq) {
 							seq.incrementAndGet();	
 						}
 						for (Message m : queue) {
 							if (seq.get()+1 == m.getSeq()) {
-								handleMessage(m);
+								System.out.print(new String(msg.getData()));
 								seq.incrementAndGet();
 							}
 						}
@@ -68,10 +48,10 @@ public class ServerDatagramP2pListener extends AbstractNetworkListener implement
 						queue.add(msg);
 					}	
 				} 
-			} catch (IOException e) {
+			} catch(IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 }
