@@ -2,7 +2,6 @@ package com.prapps.chess.api.udp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.util.PriorityQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

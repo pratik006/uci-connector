@@ -1,5 +1,7 @@
 package com.prapps.chess.client;
 
+import com.prapps.chess.client.UdpClient;
+
 public class ClientStarter {
 
 	public static void main(String[] args) throws Exception {

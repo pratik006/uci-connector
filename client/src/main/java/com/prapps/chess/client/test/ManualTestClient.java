@@ -39,7 +39,6 @@ public class ManualTestClient extends AbstractNetworkBase {
 				DatagramPacket p = null;
 				InetAddress a = null;
 				int port = 0;
-				int ackCount = 0;
 				while (!exit) {
 					byte[] buf = new byte[2000];
 					p = new DatagramPacket(buf, buf.length);
@@ -48,7 +47,6 @@ public class ManualTestClient extends AbstractNetworkBase {
 						a = p.getAddress();
 						port = p.getPort();
 						System.out.println("Recvd socket (port "+socket.getLocalPort()+") "+new String(p.getData()));
-						ackCount++;
 					} catch (IOException e) { e.printStackTrace();} 
 				}
 				socket.close();

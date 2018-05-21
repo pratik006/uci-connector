@@ -14,7 +14,6 @@ import com.prapps.chess.api.udp.AbstractNetworkBase;
 
 public class ManualTestServer extends AbstractNetworkBase {
 	private String id;
-	private boolean exit;
 	private ServerSocket serverSocket;
 	
 	public ManualTestServer(String id) {
@@ -70,7 +69,6 @@ public class ManualTestServer extends AbstractNetworkBase {
 						socket.send(p);
 						Thread.sleep(1000);
 					}
-					exit = true;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

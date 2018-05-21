@@ -104,7 +104,7 @@ public class SharedContext {
 	
 	private void send(DatagramPacket packet) throws IOException {
 		socket.send(packet);
-		LOG.trace("Packet sent to "+packet.getPort()+" Data: "+new String(packet.getData()));
+		LOG.trace("Packet sent to "+packet.getSocketAddress()+" Data: "+new String(packet.getData()));
 		//LOG.trace("From "+socket.getLocalAddress().getHostName()+":"+socket.getLocalPort());
 	}
 	

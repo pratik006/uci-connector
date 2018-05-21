@@ -17,13 +17,11 @@ import com.prapps.chess.server.config.ServerConfig;
 
 public class ServerDatagramP2pListener extends AbstractNetworkListener implements PacketListener {
 	private Logger LOG = LoggerFactory.getLogger(ServerDatagramP2pListener.class);
-	private AtomicLong seq;
 	private PriorityQueue<Message> queue = new PriorityQueue<>();
 	
 	
 	public ServerDatagramP2pListener(SharedContext ctx, ServerConfig serverConfig, AtomicLong seq) {
 		super(ctx, serverConfig);
-		this.seq = seq;
 	}
 
 	@Override
