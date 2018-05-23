@@ -93,6 +93,8 @@ public class MessageHeader implements MessageHeaderInterface {
 	}
 	
 	public boolean equalTransactionID(MessageHeader header) {
+		if (header == null)
+			return false;
 		byte[] idHeader = header.getTransactionID();
 		if (idHeader.length != 16) return false;
 		if ((idHeader[0] == id[0]) && (idHeader[1] == id[1]) && (idHeader[2] == id[2]) && (idHeader[3] == id[3]) && 

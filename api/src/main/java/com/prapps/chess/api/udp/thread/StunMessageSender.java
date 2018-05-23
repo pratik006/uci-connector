@@ -60,9 +60,12 @@ public class StunMessageSender implements Runnable {
 					
 				}
 			}
-			try { Thread.sleep(60000); } catch (InterruptedException e) {
-				if (!ctx.getExit().get())
-					LOG.error("interrupted"); 
+			
+			if (!ctx.getExit().get()) {
+				try { Thread.sleep(60000); } catch (InterruptedException e) {
+					if (!ctx.getExit().get())
+						LOG.error("interrupted"); 
+				}	
 			}
 		}
 		LOG.info("exitting StunMessageSender");

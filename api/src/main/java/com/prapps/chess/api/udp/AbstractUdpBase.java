@@ -18,11 +18,15 @@ public abstract class AbstractUdpBase extends AbstractNetworkBase {
 	protected SharedContext ctx;
 	
 	public AbstractUdpBase(BaseConfig config) throws Exception {
+		this(config, false);
+	}
+	
+	public AbstractUdpBase(BaseConfig config, boolean configOnly) throws Exception {
 		DatagramSocket socket = new DatagramSocket(config.getUdpConfig().getSourcePort(), getLocalAddress());
 		//socket.setReuseAddress(true);
 		//socket.setSoTimeout(config.getUdpConfig().getSocketTimeout());
 		//updateMacAddress(socket, config.getClientId());
-		ctx = new SharedContext();
+		ctx = new SharedContext(configOnly);
 		ctx.setSocket(socket);
 		ctx.setId(config.getId());
 		ctx.setOtherId(config.getOtherId());

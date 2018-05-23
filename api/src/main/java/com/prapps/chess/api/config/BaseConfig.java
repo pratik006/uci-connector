@@ -2,6 +2,7 @@ package com.prapps.chess.api.config;
 
 import java.util.List;
 
+import com.prapps.chess.api.NatDetail;
 import com.prapps.chess.api.StunServer;
 
 public class BaseConfig {
@@ -12,6 +13,8 @@ public class BaseConfig {
 	private int tcpPort;
 	private String protocol;
 	private String externalHost;
+	private Long timeoutDuration;
+	private boolean client;
 	
 	public String getId() {
 		return id;
@@ -56,12 +59,27 @@ public class BaseConfig {
 		this.tcpConfig = tcpConfig;
 	}
 
+	public Long getTimeoutDuration() {
+		return timeoutDuration;
+	}
+	public void setTimeoutDuration(Long timeoutDuration) {
+		this.timeoutDuration = timeoutDuration;
+	}
+
+	public boolean isClient() {
+		return client;
+	}
+	public void setClient(boolean client) {
+		this.client = client;
+	}
+
 	public static class UdpConfig {
 		int selectedIndex;
 		int sourcePort;
 		int refreshInterval;
 		int socketTimeout;
 		List<StunServer> stunServers;
+		private NatDetail nat;
 		
 		public int getSelectedIndex() {
 			return selectedIndex;
@@ -92,6 +110,12 @@ public class BaseConfig {
 		}
 		public void setRefreshInterval(int refreshInterval) {
 			this.refreshInterval = refreshInterval;
+		}
+		public NatDetail getNat() {
+			return nat;
+		}
+		public void setNat(NatDetail nat) {
+			this.nat = nat;
 		}
 	}
 	

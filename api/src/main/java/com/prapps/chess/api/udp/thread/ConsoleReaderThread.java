@@ -25,14 +25,20 @@ public class ConsoleReaderThread implements Runnable {
 		try {
 			while (ctx.getState() != State.HANDSHAKE_TWO_WAY) {
 				synchronized (ctx.getConnectionState()) {
-					ctx.getConnectionState().wait();
+					try {
+						ctx.getConnectionState().wait();
+					} catch (InterruptedException e) {
+						if (!ctx.getExit().get()) {
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 			
 			LOG.debug("ConsoleReaderThread: listenening...");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 			while (!ctx.getExit().get()) {
-				while (ctx.getState() != State.DISCONNECTED && (line = reader.readLine()) != null && !line.equals("\n")) {
+				while (!ctx.getExit().get() && ctx.getState() != State.DISCONNECTED && (line = reader.readLine()) != null && !line.equals("\n")) {
 					LOG.trace("line: "+line);
 					try {
 						Message msg = new Message(ctx.incrementSeq(), "critter", line + "\n");
@@ -49,8 +55,9 @@ public class ConsoleReaderThread implements Runnable {
 						break;
 					}
 				}
+				LOG.trace("end loop1");
 			}
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		LOG.debug("exitting ConsoleReaderThread");

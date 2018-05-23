@@ -53,6 +53,12 @@ public class StateChangeThread implements Runnable {
 			break;
 			case State.HANDSHAKE_TWO_WAY:
 				LOG.info("Handshake complete");
+				if (ctx.isConfigOnly()) {
+					synchronized (ctx.getExit()) {
+						ctx.getExit().set(Boolean.TRUE);
+						ctx.getExit().notifyAll();
+					}
+				}
 			break;
 			case State.DISCONNECTED:
 				LOG.info("Exit initiated...");
@@ -60,7 +66,6 @@ public class StateChangeThread implements Runnable {
 					ctx.getExit().set(Boolean.TRUE);
 					ctx.getExit().notifyAll();
 				}
-				ctx.close();
 			break;
 			}			
 		}

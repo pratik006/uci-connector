@@ -39,6 +39,11 @@ public class SharedContext {
 	private AtomicLong seq = new AtomicLong(0);
 	private AtomicLong readSeq = new AtomicLong(0);
 	private PriorityQueue<Message> queue = new PriorityQueue<>();
+	private boolean configOnly;
+	
+	public SharedContext(boolean configOnly) {
+		this.configOnly = configOnly;
+	}
 	
 	public DatagramSocket getSocket() {
 		return socket;
@@ -145,7 +150,9 @@ public class SharedContext {
 	}
 	
 	public void close() {
-		socket.close();
+		if (!socket.isClosed()) {
+			socket.close();
+		}
 	}
 	
 	private String generateUuid() {
@@ -203,5 +210,9 @@ public class SharedContext {
 	
 	public boolean hasNext() {
 		return !queue.isEmpty();
+	}
+	
+	public boolean isConfigOnly() {
+		return this.configOnly;
 	}
 }

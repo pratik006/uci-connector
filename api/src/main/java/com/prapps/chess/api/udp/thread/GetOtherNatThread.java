@@ -3,11 +3,14 @@ package com.prapps.chess.api.udp.thread;
 import static com.prapps.chess.api.udp.SharedContext.TIME_DIFF_ALLOWED;
 import static com.prapps.chess.api.udp.State.RECEIVED_OTHER_MAC;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.prapps.chess.api.NatDetail;
 import com.prapps.chess.api.RestUtil;
 import com.prapps.chess.api.udp.SharedContext;
@@ -29,7 +32,7 @@ public class GetOtherNatThread implements Runnable {
 					synchronized (ctx.getConnectionState()) {
 						ctx.getConnectionState().wait();	
 					}
-				} catch (InterruptedException e) { e.printStackTrace(); }
+				} catch (InterruptedException e) { if (!ctx.getExit().get()) e.printStackTrace(); }
 			}
 			
 			try {
@@ -43,6 +46,17 @@ public class GetOtherNatThread implements Runnable {
 						synchronized (ctx.getConnectionState()) {
 							ctx.getConnectionState().get().setState(RECEIVED_OTHER_MAC);
 							ctx.getConnectionState().notifyAll();
+						}	
+					}
+					
+					if (ctx.getBaseConfig().isClient()) {
+						try {
+							ctx.getBaseConfig().getUdpConfig().setNat(otherNat);
+							ctx.getObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+							ctx.getObjectMapper().writeValue(new File("clientConfig.json"), ctx.getBaseConfig());
+							LOG.debug("clientConfig updated");
+						} catch (IOException e) {
+							e.printStackTrace();
 						}	
 					}
 					Thread.sleep(TIME_DIFF_ALLOWED - Calendar.getInstance().getTimeInMillis() + otherNat.getLastUpdated());
