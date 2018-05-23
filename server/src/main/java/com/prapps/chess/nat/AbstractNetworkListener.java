@@ -53,7 +53,7 @@ public abstract class AbstractNetworkListener implements Runnable {
 					while (!output.isEmpty()) {
 						Message msg = output.poll();
 						msg.setSeq(ctx.incrementSeq());
-						LOG.debug("engine To Client: "+new String(msg.getData()));
+						LOG.debug("engine To Client: seq: "+msg.getSeq()+" "+new String(msg.getData()));
 						send(msg);
 					}
 				}
