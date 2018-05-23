@@ -44,11 +44,12 @@ public class DatagramUciListener implements PacketListener {
 							ctx.incrementReadSeq();
 						}
 					}
+					LOG.debug("Server to Client: seq "+msg.getSeq()+" "+sb.toString());
 					System.out.print(sb.toString());
-					System.out.flush();
 				} else {
 					ctx.addToQueue(msg);
-				}	
+				}
+				System.out.flush();
 			} catch(JsonParseException ex) {} catch(IOException e) { e.printStackTrace(); }
 		}
 	}
