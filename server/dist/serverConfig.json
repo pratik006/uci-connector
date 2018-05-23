@@ -1,6 +1,7 @@
 {
 "id": "Desky",
 "otherId": "lappy",
+"client": false,
 "protocol": "udp",
 "udpConfig": {
 	"stunServers": [{"host": "jstun.javawi.de","port": 3478}, {"host": "stun4.l.google.com","port": 19302}],
@@ -13,6 +14,7 @@
 	"port": 11110
 },
 "externalHost": "https://speech-translator-44168.firebaseio.com/",
+"timeoutDuration": 180000,
 
 
 "servers": [

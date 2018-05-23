@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.prapps.chess.api.Message;
 import com.prapps.chess.api.udp.SharedContext;
 import com.prapps.chess.api.udp.State;
 
@@ -53,6 +54,13 @@ public class StateChangeThread implements Runnable {
 			break;
 			case State.HANDSHAKE_TWO_WAY:
 				LOG.info("Handshake complete");
+				Message msg = new Message(ctx.incrementSeq(), ctx.getBaseConfig().getSelectedEngine(), "uci" + "\n");
+				msg.setType(Message.ENGINE_TYPE);
+				try {
+					ctx.send(msg);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				if (ctx.isConfigOnly()) {
 					synchronized (ctx.getExit()) {
 						ctx.getExit().set(Boolean.TRUE);

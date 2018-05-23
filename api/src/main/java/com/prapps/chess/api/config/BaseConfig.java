@@ -15,6 +15,8 @@ public class BaseConfig {
 	private String externalHost;
 	private Long timeoutDuration;
 	private boolean client;
+	private String selectedEngine;
+	private List<String> engines;
 	
 	public String getId() {
 		return id;
@@ -71,6 +73,19 @@ public class BaseConfig {
 	}
 	public void setClient(boolean client) {
 		this.client = client;
+	}
+
+	public String getSelectedEngine() {
+		return selectedEngine;
+	}
+	public void setSelectedEngine(String selectedEngine) {
+		this.selectedEngine = selectedEngine;
+	}
+	public List<String> getEngines() {
+		return engines;
+	}
+	public void setEngines(List<String> engines) {
+		this.engines = engines;
 	}
 
 	public static class UdpConfig {

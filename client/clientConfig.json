@@ -17,8 +17,8 @@
       "id" : "Desky",
       "host" : "183.83.195.90",
       "port" : 9731,
-      "lastUpdated" : 1527079563202,
-      "lastUpdatedTime" : "Wed May 23 18:16:03 IST 2018"
+      "lastUpdated" : 1527080356792,
+      "lastUpdatedTime" : "Wed May 23 18:29:16 IST 2018"
     }
   },
   "tcpConfig" : {
@@ -28,5 +28,7 @@
   "protocol" : "udp",
   "externalHost" : "https://speech-translator-44168.firebaseio.com/",
   "timeoutDuration" : 180000,
-  "client" : true
+  "client" : true,
+  "selectedEngine" : "critter",
+  "engines" : [ ]
 }

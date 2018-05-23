@@ -41,7 +41,7 @@ public class ConsoleReaderThread implements Runnable {
 				while (!ctx.getExit().get() && ctx.getState() != State.DISCONNECTED && (line = reader.readLine()) != null && !line.equals("\n")) {
 					LOG.trace("line: "+line);
 					try {
-						Message msg = new Message(ctx.incrementSeq(), "critter", line + "\n");
+						Message msg = new Message(ctx.incrementSeq(), ctx.getBaseConfig().getSelectedEngine(), line + "\n");
 						msg.setType(Message.ENGINE_TYPE);
 						ctx.send(msg);
 					} catch (IOException e) {
