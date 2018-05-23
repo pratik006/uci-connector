@@ -21,16 +21,11 @@
 	</dependencies>
 
 	<build>
-		<finalName>uci-connector</finalName>
+		<finalName>uci-connector-server</finalName>
 		<defaultGoal>clean compile assembly:single</defaultGoal>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source />
-					<target />
-				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>

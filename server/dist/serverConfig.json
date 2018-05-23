@@ -1,0 +1,54 @@
+{
+"id": "Desky",
+"otherId": "lappy",
+"protocol": "udp",
+"udpConfig": {
+	"stunServers": [{"host": "jstun.javawi.de","port": 3478}, {"host": "stun4.l.google.com","port": 19302}],
+	"selectedIndex": 0,
+	"sourcePort": 12000,
+	"refreshInterval": 60000,
+	"socketTimeout": 10000
+},
+"tcpConfig": {
+	"port": 11110
+},
+"externalHost": "https://speech-translator-44168.firebaseio.com/",
+
+
+"servers": [
+	{
+		"id": "houdini",
+		"name": "houdini",
+		"path": "/media/pratik/Backup/programming/Chess/ChessEngines/Houdini_4_Pro_x64A-v1x/Houdini_4_Pro_x64A-v1x.exe",
+		"port": 1,
+		"enabled": false
+	},
+	{
+		"id": "critter",
+		"name": "critter",
+		"path": "/media/pratik/Backup/programming/Chess/ChessEngines//critter_1.6a_linux/critter-16a-64bit",
+		"port": 2,
+		"enabled": true
+	},
+	{
+		"id": "stockfish",
+		"name": "stockfish",
+		"path": "/media/pratik/Backup/programming/Chess/ChessEngines/stockfish-dd-src/stockfish",
+		"port": 3,
+		"enabled": true
+	},
+	{
+		"id": "komodo3",
+		"name": "komodo3",
+		"path": "/media/pratik/Backup/programming/Chess/ChessEngines/komodo3-linux/komodo3",
+		"port": 4,
+		"enabled": true
+	},
+	{
+		"id": "rybka",
+		"name": "rybka",
+		"path": "/media/pratik/Backup/programming/Chess/ChessEngines/Rybka_4_2/Deep Rybka 4 x64.exe",
+		"port": 5,
+		"enabled": false
+	}]
+}
