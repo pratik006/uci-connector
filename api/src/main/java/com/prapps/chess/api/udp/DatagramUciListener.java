@@ -6,6 +6,7 @@ import java.net.DatagramPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.prapps.chess.api.Message;
 
 public class DatagramUciListener implements PacketListener {
@@ -28,6 +29,8 @@ public class DatagramUciListener implements PacketListener {
 					return;
 				}
 				
+				LOG.trace("Expecting seq "+(ctx.getReadSeq()+1)+" has "+msg.getSeq());
+				
 				StringBuilder sb = new StringBuilder();
 				if (ctx.getReadSeq()+1 == msg.getSeq()) {
 					sb.append(new String(msg.getData()));
@@ -46,7 +49,7 @@ public class DatagramUciListener implements PacketListener {
 				} else {
 					ctx.addToQueue(msg);
 				}	
-			} catch(IOException e) { e.printStackTrace(); }
+			} catch(JsonParseException ex) {} catch(IOException e) { e.printStackTrace(); }
 		}
 	}
 
