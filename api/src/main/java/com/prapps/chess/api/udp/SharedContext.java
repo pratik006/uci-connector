@@ -185,11 +185,12 @@ public class SharedContext {
 	}
 	
 	public Long getReadSeq() {
-		return seq.get();
+		return readSeq.get();
 	}
 	
 	public Long incrementReadSeq() {
-		return this.seq.incrementAndGet();
+		LOG.debug("incrementing read seq from "+this.readSeq.get());
+		return this.readSeq.incrementAndGet();
 	}
 	
 	public void addToQueue(Message msg) {

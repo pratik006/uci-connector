@@ -59,13 +59,15 @@ public class ServerDatagramP2pListener extends AbstractNetworkListener implement
 				if (ctx.getReadSeq()+1 == msg.getSeq()) {
 					handleMessage(msg);
 					synchronized (ctx.getReadSeq()) {
-						ctx.incrementSeq();	
+						long s = ctx.incrementReadSeq();
+						LOG.trace("seq now is : "+s);
 					}
 					
 					for (Message m : queue) {
 						if (ctx.getReadSeq()+1 == m.getSeq()) {
 							handleMessage(msg);
-							ctx.incrementSeq();
+							long s = ctx.incrementReadSeq();
+							LOG.trace("seq now is : "+s);
 						}
 					}
 				} else {

@@ -35,13 +35,13 @@ public class DatagramUciListener implements PacketListener {
 				if (ctx.getReadSeq()+1 == msg.getSeq()) {
 					sb.append(new String(msg.getData()));
 					synchronized (ctx.getReadSeq()) {
-						ctx.incrementSeq();	
+						ctx.incrementReadSeq();	
 					}
 					
 					while ((msg = ctx.poll()) != null) {
 						if (ctx.getReadSeq()+1 == msg.getSeq()) {
 							sb.append(new String(msg.getData()));
-							ctx.incrementSeq();
+							ctx.incrementReadSeq();
 						}
 					}
 					System.out.print(sb.toString());
