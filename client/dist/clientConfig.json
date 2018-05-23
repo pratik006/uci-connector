@@ -29,6 +29,6 @@
   "externalHost" : "https://speech-translator-44168.firebaseio.com/",
   "timeoutDuration" : 180000,
   "client" : true,
-  "selectedEngine" : null,
+  "selectedEngine" : "critter",
   "engines" : null
 }
