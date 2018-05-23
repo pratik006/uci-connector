@@ -33,6 +33,7 @@ public class DatagramUciListener implements PacketListener {
 				
 				StringBuilder sb = new StringBuilder();
 				if (ctx.getReadSeq()+1 == msg.getSeq()) {
+					LOG.debug("Server to Client: seq "+msg.getSeq()+" "+new String(msg.getData()));
 					sb.append(new String(msg.getData()));
 					synchronized (ctx.getReadSeq()) {
 						ctx.incrementReadSeq();	
@@ -40,11 +41,11 @@ public class DatagramUciListener implements PacketListener {
 					
 					while ((msg = ctx.poll()) != null) {
 						if (ctx.getReadSeq()+1 == msg.getSeq()) {
+							LOG.debug("Server to Client: seq "+msg.getSeq()+" "+new String(msg.getData()));
 							sb.append(new String(msg.getData()));
 							ctx.incrementReadSeq();
 						}
 					}
-					LOG.debug("Server to Client: seq "+msg.getSeq()+" "+sb.toString());
 					System.out.print(sb.toString());
 				} else {
 					ctx.addToQueue(msg);

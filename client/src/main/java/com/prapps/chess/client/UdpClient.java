@@ -1,9 +1,5 @@
 package com.prapps.chess.client;
 
-import static com.prapps.chess.api.udp.State.RECEIVED_OTHER_MAC;
-
-import java.io.ByteArrayInputStream;
-
 import com.prapps.chess.api.udp.AbstractUdpBase;
 import com.prapps.chess.api.udp.DatagramUciListener;
 import com.prapps.chess.api.udp.State;
