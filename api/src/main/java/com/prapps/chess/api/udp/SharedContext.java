@@ -176,10 +176,8 @@ public class SharedContext {
 	}
 	
 	public void resetSeq() {
-		synchronized (seq) {
-			this.seq.set(0);	
-		}
-		readSeq.set(0);
+		this.readSeq.set(0);
+		this.seq.set(0);
 		queue.clear();
 	}
 	
@@ -188,6 +186,7 @@ public class SharedContext {
 	}
 	
 	public Long incrementSeq() {
+		LOG.trace("incrementing seq to "+(seq.get()+1));
 		return this.seq.incrementAndGet();
 	}
 	

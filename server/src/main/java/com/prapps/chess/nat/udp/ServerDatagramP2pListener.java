@@ -51,10 +51,15 @@ public class ServerDatagramP2pListener extends AbstractNetworkListener implement
 					return;
 				}
 				
-				LOG.trace("Expecting seq "+(ctx.getReadSeq()+1)+" has "+msg.getSeq());
+				LOG.trace("Expecting read seq "+(ctx.getReadSeq()+1)+" has "+msg.getSeq());
 				if (ctx.getReadSeq() > msg.getSeq()) {
-					LOG.error("discarding... incorrect sequence");
-					return;
+					if (msg.getSeq() == 1) {
+						LOG.debug("resetting sequence");
+						ctx.resetSeq();
+					} else {
+						LOG.error("discarding invalid sequence "+msg.getSeq());
+						return;	
+					}
 				}
 				if (ctx.getReadSeq()+1 == msg.getSeq()) {
 					handleMessage(msg);

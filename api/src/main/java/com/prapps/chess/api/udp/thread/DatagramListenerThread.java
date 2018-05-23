@@ -31,6 +31,6 @@ public class DatagramListenerThread implements Runnable {
 					e.printStackTrace();
 			}
 		}
-		LOG.info("exitting DatagramListenerThread");
+		LOG.debug("exitting DatagramListenerThread");
 	}
 }

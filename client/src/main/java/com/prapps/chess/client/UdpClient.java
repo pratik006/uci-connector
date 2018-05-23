@@ -41,7 +41,7 @@ public class UdpClient extends AbstractUdpBase {
 		Thread consoleThread = new Thread(new ConsoleReaderThread(ctx));
 		
 		try {
-			if (System.currentTimeMillis() - ctx.getBaseConfig().getUdpConfig().getNat().getLastUpdated() > ctx.getBaseConfig().getTimeoutDuration()) {
+			if (ctx.isConfigOnly() || System.currentTimeMillis() - ctx.getBaseConfig().getUdpConfig().getNat().getLastUpdated() > ctx.getBaseConfig().getTimeoutDuration()) {
 				LOG.info("connection timeout.. re-establishing");
 				stunSender.start();
 				otherNat.start();

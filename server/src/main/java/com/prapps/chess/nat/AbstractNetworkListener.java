@@ -88,6 +88,9 @@ public abstract class AbstractNetworkListener implements Runnable {
 				send(new Message(1, null, Arrays.toString(engineIds.toArray())));
 			}
 		}
+		if (new String(msg.getData()).contains("quit")) {
+			ctx.resetSeq();
+		}
 	}
 	
 	protected abstract void send(Message msg);

@@ -53,23 +53,26 @@ public class StateChangeThread implements Runnable {
 				sendMsg(State.HANDSHAKE_TWO_WAY);
 			break;
 			case State.HANDSHAKE_TWO_WAY:
-				LOG.info("Handshake complete");
-				Message msg = new Message(ctx.incrementSeq(), ctx.getBaseConfig().getSelectedEngine(), "uci" + "\n");
-				msg.setType(Message.ENGINE_TYPE);
-				try {
-					ctx.send(msg);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if (ctx.isConfigOnly()) {
-					synchronized (ctx.getExit()) {
-						ctx.getExit().set(Boolean.TRUE);
-						ctx.getExit().notifyAll();
-					}
+				LOG.debug("Handshake complete");
+				if (ctx.getBaseConfig().isClient()) {
+					if (ctx.isConfigOnly()) {
+						synchronized (ctx.getExit()) {
+							ctx.getExit().set(Boolean.TRUE);
+							ctx.getExit().notifyAll();
+						}
+					} else {
+						Message msg = new Message(ctx.incrementSeq(), ctx.getBaseConfig().getSelectedEngine(), "uci" + "\n");
+						msg.setType(Message.ENGINE_TYPE);
+						try {
+							ctx.send(msg);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}	
 				}
 			break;
 			case State.DISCONNECTED:
-				LOG.info("Exit initiated...");
+				LOG.debug("Exit initiated...");
 				synchronized (ctx.getExit()) {
 					ctx.getExit().set(Boolean.TRUE);
 					ctx.getExit().notifyAll();
@@ -77,7 +80,7 @@ public class StateChangeThread implements Runnable {
 			break;
 			}			
 		}
-		LOG.info("exitting...");
+		LOG.debug("exitting...");
 	}
 	
 	public void sendMsg(int state) {
