@@ -1,16 +1,32 @@
 {
-"id": "lappy",
-"otherId": "Desky",
-"protocol": "udp",
-"udpConfig": {
-	"stunServers": [{"host": "jstun.javawi.de","port": 3478}, {"host": "stun4.l.google.com","port": 19302}],
-	"selectedIndex": 0,
-	"sourcePort": 12001,
-	"refreshInterval": 60000,
-	"socketTimeout": 10000
-},
-"tcpConfig": {
-	"port": 11110
-},
-"externalHost": "https://speech-translator-44168.firebaseio.com/"
+  "id" : "lappy",
+  "otherId" : "Desky",
+  "udpConfig" : {
+    "selectedIndex" : 0,
+    "sourcePort" : 12001,
+    "refreshInterval" : 60000,
+    "socketTimeout" : 10000,
+    "stunServers" : [ {
+      "host" : "jstun.javawi.de",
+      "port" : 3478
+    }, {
+      "host" : "stun4.l.google.com",
+      "port" : 19302
+    } ],
+    "nat" : {
+      "id" : "Desky",
+      "host" : "183.83.195.90",
+      "port" : 9731,
+      "lastUpdated" : 1527080051793,
+      "lastUpdatedTime" : "Wed May 23 18:24:11 IST 2018"
+    }
+  },
+  "tcpConfig" : {
+    "port" : 11110
+  },
+  "tcpPort" : 0,
+  "protocol" : "udp",
+  "externalHost" : "https://speech-translator-44168.firebaseio.com/",
+  "timeoutDuration" : 180000,
+  "client" : true
 }
