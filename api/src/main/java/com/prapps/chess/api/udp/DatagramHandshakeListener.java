@@ -23,8 +23,8 @@ public class DatagramHandshakeListener implements PacketListener {
 		Message msg;
 		try {
 			msg = ctx.getObjectMapper().readValue(new String(packet.getData()), Message.class);
-			if (System.currentTimeMillis() - msg.getTimestamp() > 30000) {
-				LOG.trace("Old packet, discarding");
+			if (System.currentTimeMillis() - msg.getTimestamp() > 300000) {
+				LOG.trace("Old packet, discarding.. current time "+System.currentTimeMillis()+" Packet Time: "+msg.getTimestamp());
 				return;
 			}
 			
