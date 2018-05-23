@@ -16,9 +16,9 @@
     "nat" : {
       "id" : "Desky",
       "host" : "183.83.195.90",
-      "port" : 9731,
-      "lastUpdated" : 1527080356792,
-      "lastUpdatedTime" : "Wed May 23 18:29:16 IST 2018"
+      "port" : 11336,
+      "lastUpdated" : 1527097512770,
+      "lastUpdatedTime" : "Wed May 23 23:15:12 IST 2018"
     }
   },
   "tcpConfig" : {

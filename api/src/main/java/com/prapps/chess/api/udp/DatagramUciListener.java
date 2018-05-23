@@ -24,7 +24,7 @@ public class DatagramUciListener implements PacketListener {
 			try {
 				msg = ctx.getObjectMapper().readValue(new String(packet.getData()), Message.class);
 				LOG.trace("UCI server msg: "+msg);
-				if (msg.getType() != Message.ENGINE_TYPE || System.currentTimeMillis() - msg.getTimestamp() > 30000) {
+				if (msg.getType() != Message.ENGINE_TYPE || System.currentTimeMillis() - msg.getTimestamp() > ctx.getBaseConfig().getTimeoutDuration()) {
 					LOG.trace("Old packet, discarding");
 					return;
 				}

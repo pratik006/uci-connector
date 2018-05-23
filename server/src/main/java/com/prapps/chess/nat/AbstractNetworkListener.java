@@ -80,9 +80,10 @@ public abstract class AbstractNetworkListener implements Runnable {
 	}
 	
 	public void handleMessage(Message msg) throws IOException {
-		if (engineIds.contains(msg.getEngineId()))
+		LOG.trace("handleMessage "+new String(msg.getData())+"\tengine: "+msg.getEngineId());
+		if (engineIds.contains(msg.getEngineId())) {
 			engineController.addMessage(msg);
-		else {
+		} else {
 			String str = new String(msg.getData());
 			if (str.indexOf("get_available_engines") != -1) {
 				send(new Message(1, null, Arrays.toString(engineIds.toArray())));
