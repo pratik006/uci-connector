@@ -27,6 +27,12 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>2.9.5</version>
 		</dependency>
+		<dependency>
+			<groupId>com.prapps.chess</groupId>
+			<artifactId>uci-connector-common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
 
 		<!-- <dependency> <groupId>com.google.code.gson</groupId> <artifactId>gson</artifactId> 
 			<version>2.2.4</version> </dependency> -->
