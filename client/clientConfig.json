@@ -1,0 +1,7 @@
+{
+	"id": "lappy",
+	"externalServerUrl": "https://uci-connector.firebaseio.com/servers.json",
+	"networkPref": "external",
+	"serverId": "i7-3770k",
+	"engineId": "critter"
+}
