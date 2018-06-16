@@ -29,7 +29,7 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         try {
-			adminServer = new AdminServer("serverConfig.xml");
+			adminServer = new AdminServer("serverConfig.json");
 			System.getProperties().put("-Djava.util.logging.config.file", "h:/logging.properties");
 			System.out.println(System.getProperty("java.home"));
 			
