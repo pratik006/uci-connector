@@ -41,9 +41,7 @@ public class AsyncReader extends AbstractRunnable {
 			try {
 				os.write("quit\n".getBytes());
 				os.flush();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}	
+			} catch (IOException e1) { }	
 		}/*
 		finally {
 			try {

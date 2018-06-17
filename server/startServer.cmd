@@ -1,0 +1,1 @@
+java -jar -Djava.util.logging.config.file=logging.properties target/uci-server-jar-with-dependencies.jar

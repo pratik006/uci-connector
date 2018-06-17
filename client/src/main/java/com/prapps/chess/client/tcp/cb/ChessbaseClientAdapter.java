@@ -54,29 +54,19 @@ public class ChessbaseClientAdapter {
 					try {
 						byte[] buf = new byte[ProtocolConstants.BUFFER_SIZE];
 						int readLen = -1;
-						while ((readLen = socket.getInputStream().read(buf)) != -1) {
+						while (!exit && (readLen = socket.getInputStream().read(buf)) != -1) {
 							System.out.write(buf, 0, readLen);
 							System.out.flush();
 						}
 						
 						log("Server: "+new String(buf, 0, readLen));
-						if("exit".equalsIgnoreCase(new String(buf, 0, readLen))) {
+						if(new String(buf, 0, readLen).contains("exit")) {
 							exit = true;
-						} else {
-							System.out.write(buf, 0, readLen);
-							System.out.flush();
 						}
 					} catch (IOException e) {
 						exit = true;
 						e.printStackTrace();
 					}
-				}
-				
-				try {
-					System.out.write("quit\n".getBytes());
-					//consoleInputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
 				log("Closing CB Writer");
 			}
@@ -98,7 +88,7 @@ public class ChessbaseClientAdapter {
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}
-				LOG.finest("closing cbReader");
+				log("closing cbReader");
 			}
 		});
 
@@ -126,6 +116,7 @@ public class ChessbaseClientAdapter {
 	}
 	
 	private void log(byte[] buf, int len) {
+		//System.out.println("Chessbase: "+new String(buf, 0, len));
 		if (LOG.isLoggable(Level.FINEST)) {
 			LOG.finest("Chessbase: "+new String(buf, 0, len));
 		}

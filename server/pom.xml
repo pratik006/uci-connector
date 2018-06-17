@@ -35,7 +35,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.prapps.chess.client.tcp.cb.ChessbaseClientAdapter</mainClass>
+							<mainClass>com.prapps.chess.server.uci.tcp.AdminServer</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

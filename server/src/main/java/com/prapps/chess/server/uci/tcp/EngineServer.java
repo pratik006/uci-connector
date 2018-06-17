@@ -68,7 +68,7 @@ public class EngineServer implements Runnable {
 				p.destroy();
 				LOG.fine("Closing Engine on port "+sock.getPort());
 				if(!sock.isConnected()) {
-					sock.getOutputStream().write("exit".getBytes());
+					sock.getOutputStream().write("exit\n".getBytes());
 					sock.close();
 				}
 			} catch (IOException e) {

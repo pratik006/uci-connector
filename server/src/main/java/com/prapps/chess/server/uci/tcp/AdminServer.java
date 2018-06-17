@@ -105,7 +105,7 @@ public class AdminServer {
 	public static String externalServerUrl = null;
 	public static void main(String[] args) throws Exception {
 		//System.getProperties().put("-Djava.util.logging.config.file", "h:/logging.properties");
-		System.out.println(System.getProperty("java.home"));
+		//System.out.println(System.getProperty("java.home"));
 		LOG.info("Admin Server : Log initialized");
 		AdminServer server = new AdminServer("serverConfig.json");
 		externalServerUrl = server.getServerConfig().getExternalServerUrl();
