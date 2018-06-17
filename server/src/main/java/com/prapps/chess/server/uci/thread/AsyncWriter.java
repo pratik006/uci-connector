@@ -1,4 +1,4 @@
-package com.prapps.chess.uci.share;
+package com.prapps.chess.server.uci.thread;
 
 import java.io.IOException;
 import java.io.InputStream;

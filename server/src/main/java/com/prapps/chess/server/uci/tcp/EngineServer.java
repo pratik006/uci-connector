@@ -9,10 +9,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Logger;
 
+import com.prapps.chess.server.uci.thread.AsyncReader;
+import com.prapps.chess.server.uci.thread.AsyncWriter;
 import com.prapps.chess.server.uci.thread.State;
 import com.prapps.chess.tcp.common.Engine;
-import com.prapps.chess.uci.share.AsyncReader;
-import com.prapps.chess.uci.share.AsyncWriter;
 
 public class EngineServer implements Runnable {
 
