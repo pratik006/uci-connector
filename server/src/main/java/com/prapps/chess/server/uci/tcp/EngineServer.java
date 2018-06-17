@@ -6,19 +6,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.logging.Logger;
 
 import com.prapps.chess.server.uci.thread.State;
+import com.prapps.chess.tcp.common.Engine;
 import com.prapps.chess.uci.share.AsyncReader;
 import com.prapps.chess.uci.share.AsyncWriter;
-import com.prapps.chess.uci.share.NetworkRW;
-import com.prapps.chess.uci.share.TCPNetworkRW;
 
-public class EngineServer extends Server implements Runnable {
+public class EngineServer implements Runnable {
 
 	private static Logger LOG = Logger.getLogger(EngineServer.class.getName());
 	
-	private NetworkRW networkRW;
+	private Engine engine;
+	private State state;
 	public volatile boolean stateClosing = false;
 	private ServerSocket serverSocket;
 	private Thread guiToEngineWriterThread;
@@ -28,36 +29,33 @@ public class EngineServer extends Server implements Runnable {
 	InputStream is;
 	OutputStream os;
 	
-	public EngineServer(Server server) throws IOException {
-		this.id = server.id;
-		this.name = server.name;
-		this.path = server.path;
-		this.command = server.command;
-		this.port = server.port;
-		File file = new File(path);
+	public EngineServer(Engine engine) throws IOException {
+		this.engine = engine;
+		File file = new File(engine.getPath());
 		if(!file.exists()) {
-			throw new FileNotFoundException("Invalid Engine Path"+path);
+			throw new FileNotFoundException("Invalid Engine Path" + engine.getPath());
 		}
-		serverSocket = new ServerSocket(port);
+		serverSocket = new ServerSocket(engine.getPort());
 		setState(State.New);
 	}
 	
 	public void listen() throws IOException {		
-		LOG.info(name+" -> TCP server port: "+port);
-		LOG.info("waiting for connection on Engine port: "+serverSocket.getLocalPort());
-		LOG.info("Engine: "+path);
+		LOG.info(engine.getId() + " -> TCP server port: " + engine.getPort());
+		LOG.info("waiting for connection on Engine port: " + serverSocket.getLocalPort());
+		LOG.info("Engine: "+engine.getPath());
 		setState(State.Waiting);
-		networkRW = new TCPNetworkRW(serverSocket.accept());
+		Socket sock = serverSocket.accept();
+		LOG.info("connection received");
 		setState(State.Connected);
 		LOG.fine("\n--------------------------------------Start Server ----------------------------------\n");
 		Process p = null;
-		if(!networkRW.isClosed() && networkRW.isConnected()) {
+		if(!sock.isClosed() && sock.isConnected()) {
 			try {
-				p = startEngine(path, command);
+				p = startEngine(engine.getPath(), engine.getCommand());
 				os = p.getOutputStream();
 				is = p.getInputStream();
-				reader = new AsyncReader(os, networkRW, stateClosing);
-				writer = new AsyncWriter(is, networkRW, stateClosing);
+				reader = new AsyncReader(os, sock.getInputStream(), stateClosing);
+				writer = new AsyncWriter(is, sock.getOutputStream(), stateClosing);
 				guiToEngineWriterThread = new Thread(reader);
 				engineToGUIWriterThread = new Thread(writer);
 				// writer.setDaemon(true);
@@ -68,20 +66,20 @@ public class EngineServer extends Server implements Runnable {
 				if(guiToEngineWriterThread.isAlive())
 					guiToEngineWriterThread.join();
 				p.destroy();
-				LOG.fine("Closing Engine on port "+networkRW.getPort());
-				if(!networkRW.isConnected()) {
-					networkRW.writeToNetwork("exit");
-					networkRW.close();
+				LOG.fine("Closing Engine on port "+sock.getPort());
+				if(!sock.isConnected()) {
+					sock.getOutputStream().write("exit".getBytes());
+					sock.close();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
-				networkRW.close();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} finally {
 				if(null != p)
 					p.destroy();
-				super.setState(State.Closed);
+				state = State.Closed;
+				sock.close();
 			}
 		}
 	}
@@ -99,13 +97,13 @@ public class EngineServer extends Server implements Runnable {
 
 	public void run() {
 		try {
-			while(State.Exit != getState())
+			while(State.Exit != state)
 				listen();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		setState(State.Closed);
-		LOG.info(name + "Engine Server closed");
+		LOG.info(engine.getId() + "Engine Server closed");
 	}
 	
 	public void close() {
@@ -140,7 +138,7 @@ public class EngineServer extends Server implements Runnable {
 	public void setState(State state) {
 		if (State.Closed == state) {
 			System.err.println("time to restart the server");
-			try {
+			/*try {
 				networkRW.writeToNetwork("exit");
 				reader.setState(State.Closed);
 				writer.setState(State.Closed);
@@ -151,10 +149,22 @@ public class EngineServer extends Server implements Runnable {
 				networkRW.close();
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
+			}*/
 		}
-		LOG.finest(this.id + " state changed to : " + state);
-		super.setState(state);
+		LOG.finest(engine.getId() + " state changed to : " + state);
+		this.state = state;
+	}
+	
+	public State getState() {
+		return state;
+	}
+	
+	public String getId() {
+		return engine.getId();
+	}
+	
+	public int getPort() {
+		return engine.getPort();
 	}
 
 }

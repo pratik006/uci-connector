@@ -2,8 +2,8 @@ package com.prapps.chess.client.tcp.cb;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,45 +23,62 @@ public class ChessbaseClientAdapter {
 		adapter.start();
 	}
 	
+	private Socket connect(ServerConfig serverConfig) throws UnknownHostException, IOException {
+		Socket socket = null;
+		int port = serverConfig.getEngines().iterator().next().getPort();
+		if (serverConfig.getIp().equals(serverConfig.getLocalIp())) {
+			try {
+				log("connecting to "+serverConfig.getIp()+":"+port);
+				socket = new Socket(serverConfig.getIp(), port);
+			} catch(java.net.ConnectException ex) {
+				log("Failed connecting to public ip");
+			}	
+		} else {
+			log("connecting to "+serverConfig.getLocalIp()+":"+port);
+			socket = new Socket(config.getServer().getLocalIp(), port);
+		}
+		
+		
+		return socket;
+	}
+	
 	public void start() throws IOException, InterruptedException {
 		config = ClientConfigLoader.INSTANCE.getConfig();
 		log("Client config file loaded");
-		ServerConfig.Engine engine = config.getServer().getEngines().iterator().next();
-		InetAddress ip = InetAddress.getByName(config.getServer().getIp());
-		Socket socket = new Socket(ip, engine.getOffsetPort());
+		final Socket socket = connect(config.getServer());
+		
 		log("Socket created");
 		Thread cbWriter = new Thread(new Runnable() {
 			public void run() {
-				StringBuilder serverMsg = null;
 				while (!exit) {
 					try {
 						byte[] buf = new byte[ProtocolConstants.BUFFER_SIZE];
-						int readLen = socket.getInputStream().read(buf);
-						serverMsg = new StringBuilder();
-						while (readLen != -1) {
-							serverMsg.append(new String(buf, 0, readLen));
+						int readLen = -1;
+						while ((readLen = socket.getInputStream().read(buf)) != -1) {
+							System.out.write(buf, 0, readLen);
+							System.out.flush();
 						}
 						
-						log("Server: "+serverMsg);
-						if("exit".equalsIgnoreCase(serverMsg.toString())) {
-							socket.close();
+						log("Server: "+new String(buf, 0, readLen));
+						if("exit".equalsIgnoreCase(new String(buf, 0, readLen))) {
 							exit = true;
-						}
-						else {
-							System.out.write(serverMsg.toString().getBytes("UTF-8"));
+						} else {
+							System.out.write(buf, 0, readLen);
 							System.out.flush();
 						}
 					} catch (IOException e) {
+						exit = true;
 						e.printStackTrace();
 					}
 				}
-				log("Closing CB Writer");
+				
 				try {
-					System.out.write("quit".getBytes());
-					consoleInputStream.close();
+					System.out.write("quit\n".getBytes());
+					//consoleInputStream.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				log("Closing CB Writer");
 			}
 		});
 
@@ -73,6 +90,7 @@ public class ChessbaseClientAdapter {
 					while (!exit && (readLen = consoleInputStream.read(buffer)) != -1) {
 						log(buffer, readLen);
 						socket.getOutputStream().write(buffer, 0, readLen);
+						socket.getOutputStream().flush();
 						if (new String(buffer, 0, readLen).contains("quit")) {
 							exit = true;
 						}
@@ -82,7 +100,6 @@ public class ChessbaseClientAdapter {
 				}
 				LOG.finest("closing cbReader");
 			}
-
 		});
 
 		cbReader.start();
@@ -90,10 +107,17 @@ public class ChessbaseClientAdapter {
 
 		if (cbWriter.isAlive())
 			cbWriter.join();
-		/*if (cbReader.isAlive())
+		
+		log("cbWriter joined");
+		
+		cbReader.stop();
+		/* TODO cbReader.interrupt instead of stop
+		 * if (cbReader.isAlive())
 			cbReader.join();*/
-		cbReader.interrupt();
-		log("Closing CB Adapter");
+		log("cbReader joined");
+		
+		log("Closing Chessbase Client Adapter");
+		socket.close();
 		System.exit(0);
 	}
 	
@@ -102,7 +126,6 @@ public class ChessbaseClientAdapter {
 	}
 	
 	private void log(byte[] buf, int len) {
-		System.out.println("Chessbase: "+new String(buf, 0, len));
 		if (LOG.isLoggable(Level.FINEST)) {
 			LOG.finest("Chessbase: "+new String(buf, 0, len));
 		}

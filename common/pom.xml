@@ -5,4 +5,17 @@
 	<artifactId>uci-connector-common</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>uci-connector</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.9.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.5</version>
+		</dependency>
+	</dependencies>
 </project>

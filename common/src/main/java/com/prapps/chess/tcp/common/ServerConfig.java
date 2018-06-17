@@ -1,11 +1,14 @@
 package com.prapps.chess.tcp.common;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ServerConfig {
 	private String id;
 	private String ip;
+	private String localIp;
 	private int port;
+	private String externalServerUrl;
 	private List<Engine> engines;
 	
 	public String getId() {
@@ -24,6 +27,14 @@ public class ServerConfig {
 		this.ip = ip;
 	}
 
+	public String getLocalIp() {
+		return localIp;
+	}
+
+	public void setLocalIp(String localIp) {
+		this.localIp = localIp;
+	}
+
 	public int getPort() {
 		return port;
 	}
@@ -33,6 +44,9 @@ public class ServerConfig {
 	}
 
 	public List<Engine> getEngines() {
+		if (engines == null) {
+			engines = new ArrayList<Engine>();
+		}
 		return engines;
 	}
 
@@ -40,26 +54,11 @@ public class ServerConfig {
 		this.engines = engines;
 	}
 
-	public class Engine {
-		private int offsetPort;
-		private String id;
-		
-		public Engine(String id, int offsetPort) {
-			this.id = id;
-			this.offsetPort = offsetPort;
-		}
-		
-		public int getOffsetPort() {
-			return offsetPort;
-		}
-		public void setOffsetPort(int offsetPort) {
-			this.offsetPort = offsetPort;
-		}
-		public String getId() {
-			return id;
-		}
-		public void setId(String id) {
-			this.id = id;
-		}
+	public String getExternalServerUrl() {
+		return externalServerUrl;
+	}
+
+	public void setExternalServerUrl(String externalServerUrl) {
+		this.externalServerUrl = externalServerUrl;
 	}
 }

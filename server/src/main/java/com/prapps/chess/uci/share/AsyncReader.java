@@ -1,6 +1,7 @@
 package com.prapps.chess.uci.share;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
@@ -12,31 +13,26 @@ public class AsyncReader extends AbstractRunnable {
 
 	private static Logger LOG = Logger.getLogger(AsyncReader.class.getName());
 	
-	private NetworkRW networkRW;
+	private InputStream is;
 	private volatile boolean stop = false;
 	private OutputStream os;
 	public volatile boolean exit;
 	
-	public AsyncReader(OutputStream os, NetworkRW networkRW, Boolean exit) {
+	public AsyncReader(OutputStream os, InputStream is, Boolean exit) {
 		this.os = os;
-		this.networkRW = networkRW;
+		this.is = is;
 		this.exit = exit;
 	}
 	
 	public void run() {
-		StringBuffer message = new StringBuffer();
-		String msg = null;
 		setState(State.Running);
 		try {
-			while (!stop && State.Closed != getState() && (msg = networkRW.readFromNetwork()) != null) {
-				message.append(msg);
-				if(message.lastIndexOf("\n") != message.length()-1) {
-					message.append("\n");
-				}
-				LOG.finer("client: " + message+"\tLength: "+message);
-				os.write(message.toString().getBytes());
+			byte[] buf = new byte[1024];
+			int read = -1;
+			while (!stop && State.Closed != getState() && (read = is.read(buf)) != -1) {
+				LOG.finer("client: " + new String(buf, 0, read)+"\tLength: "+read);
+				os.write(buf, 0, read);
 				os.flush();
-				message = new StringBuffer();
 			}
 		} 
 		catch (IOException e) {
@@ -48,14 +44,14 @@ public class AsyncReader extends AbstractRunnable {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}	
-		}
+		}/*
 		finally {
 			try {
 				networkRW.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 		LOG.info("Closing "+getClass().getName());
 	}
 	
